@@ -448,7 +448,7 @@ html = r"""
         <div class="nowTitle" id="nowTitle">Current: —</div>
         <div class="nowSub" id="nowSub">Click a stop to fly</div>
       </div>
-      <div class="tiny">No Prev/Next • Auto fly + delay open</div>
+      <div class="tiny"></div>
     </div>
   </div>
 

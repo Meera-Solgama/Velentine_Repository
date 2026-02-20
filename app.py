@@ -1,4 +1,5 @@
 import base64
+import json
 from pathlib import Path
 import streamlit as st
 
@@ -10,8 +11,13 @@ def to_data_uri(path: Path) -> str:
     if not path.exists():
         return ""
     ext = path.suffix.lower().replace(".", "")
-    mime = "png" if ext == "png" else "jpeg"
-    return f"data:image/{mime};base64," + base64.b64encode(path.read_bytes()).decode()
+    if ext == "png":
+        mime = "png"
+    elif ext in ("jpg", "jpeg"):
+        mime = "jpeg"
+    else:
+        mime = "png"
+    return f"data:image/{mime};base64," + base64.b64encode(path.read_bytes()).decode("utf-8")
 
 # -----------------------
 # STAGES (EDIT ONLY THIS IF NEEDED)
@@ -78,37 +84,39 @@ payload = []
 for s in stages:
     payload.append({**s, "img": to_data_uri(ASSETS / s["ai"])})
 
+payload_json = json.dumps(payload)  # SAFE injection (no f-string conflicts)
+total_count = len(payload)
+
 st.markdown("## 💖 Meera ❤ Zeel — Valentine Journey (Decorative Pink Theme)")
 
 # -----------------------
-# FULL FRONTEND (HTML/CSS/JS)
+# FULL FRONTEND (HTML/CSS/JS) - NOT an f-string
 # -----------------------
-html = f"""
+html = """
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
-  :root {{
+  :root {
     --glass: rgba(255,255,255,.18);
     --stroke: rgba(255,255,255,.25);
     --text: rgba(255,255,255,.95);
     --muted: rgba(255,255,255,.78);
     --shadow: 0 18px 60px rgba(0,0,0,.35);
     --radius: 22px;
-  }}
-  *{{ box-sizing:border-box; }}
-  body {{
+  }
+  *{ box-sizing:border-box; }
+  body {
     margin:0;
     overflow:hidden;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color: var(--text);
     background: linear-gradient(135deg, #ffb3d9, #ff5fa2, #ff2d87);
-  }}
+  }
 
-  /* Decorative glow */
-  .glow {{
+  .glow {
     position: fixed; inset: -120px;
     background:
       radial-gradient(900px 500px at 15% 15%, rgba(255,255,255,.20), transparent 60%),
@@ -117,10 +125,9 @@ html = f"""
     z-index:-2;
     pointer-events:none;
     filter: blur(10px);
-  }}
+  }
 
-  /* Floating hearts */
-  .heart {{
+  .heart {
     position: fixed;
     bottom: -20px;
     font-size: 18px;
@@ -128,15 +135,14 @@ html = f"""
     animation: floatUp linear infinite;
     z-index: -1;
     filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
-  }}
-  @keyframes floatUp {{
-    0%   {{ transform: translateY(0) scale(.6) rotate(0deg); opacity: 0; }}
-    10%  {{ opacity: .85; }}
-    100% {{ transform: translateY(-120vh) scale(1.25) rotate(20deg); opacity: 0; }}
-  }}
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(.6) rotate(0deg); opacity: 0; }
+    10%  { opacity: .85; }
+    100% { transform: translateY(-120vh) scale(1.25) rotate(20deg); opacity: 0; }
+  }
 
-  /* Sparkles */
-  .spark {{
+  .spark {
     position: fixed;
     width: 6px; height: 6px;
     border-radius: 999px;
@@ -144,20 +150,19 @@ html = f"""
     opacity: .0;
     animation: twinkle ease-in-out infinite;
     z-index:-1;
-  }}
-  @keyframes twinkle {{
-    0%,100% {{ transform: scale(.6); opacity: .0; }}
-    40%     {{ opacity: .85; }}
-    60%     {{ transform: scale(1.25); opacity: .95; }}
-  }}
+  }
+  @keyframes twinkle {
+    0%,100% { transform: scale(.6); opacity: .0; }
+    40%     { opacity: .85; }
+    60%     { transform: scale(1.25); opacity: .95; }
+  }
 
-  /* HUD */
-  .hud {{
+  .hud {
     position: fixed; left: 14px; right: 14px; top: 10px;
     z-index: 20;
     display:flex; justify-content:space-between; gap: 10px; align-items:center;
-  }}
-  .pill {{
+  }
+  .pill {
     backdrop-filter: blur(12px);
     background: rgba(255,255,255,.18);
     border: 1px solid rgba(255,255,255,.26);
@@ -167,11 +172,11 @@ html = f"""
     display:flex; gap:10px; align-items:center;
     min-height: 42px;
     white-space: nowrap;
-  }}
-  .title {{ font-weight: 900; letter-spacing: .2px; }}
-  .tiny  {{ font-size: 12px; color: var(--muted); }}
+  }
+  .title { font-weight: 900; letter-spacing: .2px; }
+  .tiny  { font-size: 12px; color: var(--muted); }
 
-  .btn {{
+  .btn {
     cursor:pointer; user-select:none;
     border: 1px solid rgba(255,255,255,.28);
     background: rgba(255,255,255,.14);
@@ -180,20 +185,18 @@ html = f"""
     border-radius: 999px;
     font-weight: 800;
     transition: transform .12s ease, background .12s ease;
-  }}
-  .btn:hover {{ background: rgba(255,255,255,.22); }}
-  .btn:active {{ transform: scale(.98); }}
+  }
+  .btn:hover { background: rgba(255,255,255,.22); }
+  .btn:active { transform: scale(.98); }
 
-  /* Wrap */
-  .wrap {{
+  .wrap {
     position: fixed; inset: 0;
     padding-top: 72px;
     padding-bottom: 14px;
     display:flex; flex-direction:column;
-  }}
+  }
 
-  /* Progress track */
-  .track {{
+  .track {
     margin: 0 14px;
     height: 10px;
     border-radius: 999px;
@@ -201,15 +204,15 @@ html = f"""
     border: 1px solid rgba(255,255,255,.28);
     position: relative;
     overflow: hidden;
-  }}
-  .progress {{
+  }
+  .progress {
     height: 100%;
     width: 0%;
     border-radius: 999px;
     background: linear-gradient(90deg, rgba(255,255,255,.75), rgba(255,255,255,.40));
     transition: width .55s ease;
-  }}
-  .plane {{
+  }
+  .plane {
     position:absolute;
     top: 50%;
     left: 0%;
@@ -217,10 +220,9 @@ html = f"""
     transition: left .55s ease;
     font-size: 18px;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
-  }}
+  }
 
-  /* Horizontal journey */
-  .journey {{
+  .journey {
     flex: 1;
     margin-top: 12px;
     overflow-x: auto;
@@ -230,14 +232,14 @@ html = f"""
     gap: 16px;
     padding: 10px 14px 18px;
     -webkit-overflow-scrolling: touch;
-  }}
-  .journey::-webkit-scrollbar {{ height: 10px; }}
-  .journey::-webkit-scrollbar-thumb {{
+  }
+  .journey::-webkit-scrollbar { height: 10px; }
+  .journey::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,.35);
     border-radius: 999px;
-  }}
+  }
 
-  .stage {{
+  .stage {
     scroll-snap-align: start;
     min-width: min(86vw, 420px);
     max-width: 420px;
@@ -253,16 +255,16 @@ html = f"""
     display:flex;
     flex-direction: column;
     gap: 10px;
-  }}
+  }
 
-  .row {{
+  .row {
     display:flex;
     align-items:flex-start;
     justify-content: space-between;
     gap: 12px;
-  }}
+  }
 
-  .badge {{
+  .badge {
     font-size: 12px;
     background: rgba(255,255,255,.18);
     border: 1px solid rgba(255,255,255,.25);
@@ -270,32 +272,31 @@ html = f"""
     padding: 6px 10px;
     color: rgba(255,255,255,.92);
     width: fit-content;
-  }}
+  }
 
-  .stage h2 {{
+  .stage h2 {
     margin: 6px 0 0;
     font-size: 20px;
     line-height: 1.15;
     letter-spacing: .2px;
-  }}
-  .stage p {{
+  }
+  .stage p {
     margin: 0;
     color: rgba(255,255,255,.82);
     font-size: 13px;
     line-height: 1.5;
-  }}
+  }
 
-  /* Gift + effects */
-  .giftArea {{
+  .giftArea {
     margin-top: 6px;
     display:flex;
     align-items:center;
     justify-content:center;
     position: relative;
     min-height: 230px;
-  }}
+  }
 
-  .giftBtn {{
+  .giftBtn {
     position: relative;
     width: 168px;
     height: 168px;
@@ -303,16 +304,16 @@ html = f"""
     background: transparent;
     cursor: pointer;
     filter: drop-shadow(0 18px 28px rgba(0,0,0,.35));
-  }}
+  }
 
-  .gift {{
+  .gift {
     width: 100%;
     height: 100%;
     position: relative;
     transform-origin: center;
-  }}
+  }
 
-  .boxBase {{
+  .boxBase {
     position:absolute;
     left: 20px; right: 20px;
     bottom: 18px;
@@ -320,8 +321,8 @@ html = f"""
     border-radius: 16px;
     background: rgba(255,255,255,.22);
     border: 1px solid rgba(255,255,255,.30);
-  }}
-  .boxLid {{
+  }
+  .boxLid {
     position:absolute;
     left: 14px; right: 14px;
     bottom: 88px;
@@ -331,8 +332,8 @@ html = f"""
     border: 1px solid rgba(255,255,255,.30);
     transform-origin: left bottom;
     transition: transform .6s cubic-bezier(.2,.9,.2,1);
-  }}
-  .ribbonV {{
+  }
+  .ribbonV {
     position:absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -342,8 +343,8 @@ html = f"""
     border-radius: 999px;
     background: rgba(255,255,255,.85);
     opacity: .92;
-  }}
-  .ribbonH {{
+  }
+  .ribbonH {
     position:absolute;
     left: 20px; right: 20px;
     bottom: 58px;
@@ -351,8 +352,8 @@ html = f"""
     border-radius: 999px;
     background: rgba(255,255,255,.85);
     opacity: .92;
-  }}
-  .bow {{
+  }
+  .bow {
     position:absolute;
     left: 50%;
     bottom: 124px;
@@ -362,27 +363,27 @@ html = f"""
     display:flex; gap: 6px;
     align-items:center;
     justify-content:center;
-  }}
-  .bow span {{
+  }
+  .bow span {
     width: 26px; height: 22px;
     border-radius: 999px 999px 999px 6px;
     background: rgba(255,255,255,.90);
     transform: rotate(12deg);
     border: 1px solid rgba(255,255,255,.22);
-  }}
-  .bow span:last-child {{
+  }
+  .bow span:last-child {
     border-radius: 999px 999px 6px 999px;
     transform: rotate(-12deg);
-  }}
+  }
 
-  .opened .boxLid {{ transform: rotate(-52deg) translate(-6px,-8px); }}
+  .opened .boxLid { transform: rotate(-52deg) translate(-6px,-8px); }
 
-  .burstLayer {{
+  .burstLayer {
     position:absolute; inset:0;
     pointer-events:none;
     overflow:hidden;
-  }}
-  .balloon {{
+  }
+  .balloon {
     position:absolute;
     bottom: -40px;
     width: 24px; height: 30px;
@@ -391,8 +392,8 @@ html = f"""
     filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
     animation: floatB 1.5s ease forwards;
     opacity:.95;
-  }}
-  .balloon::after {{
+  }
+  .balloon::after {
     content:"";
     position:absolute;
     left: 50%;
@@ -402,13 +403,13 @@ html = f"""
     background: rgba(255,255,255,.75);
     transform: translateX(-50%);
     opacity:.75;
-  }}
-  @keyframes floatB {{
-    from{{ transform: translateY(0) translateX(0); opacity: .95; }}
-    to{{ transform: translateY(-260px) translateX(var(--dx)); opacity: 0; }}
-  }}
+  }
+  @keyframes floatB {
+    from{ transform: translateY(0) translateX(0); opacity: .95; }
+    to{ transform: translateY(-260px) translateX(var(--dx)); opacity: 0; }
+  }
 
-  .conf {{
+  .conf {
     position:absolute;
     width: 8px; height: 12px;
     background: rgba(255,255,255,.95);
@@ -417,14 +418,13 @@ html = f"""
     transform: translate(-50%,-50%);
     animation: confetti 1.1s ease forwards;
     opacity:.95;
-  }}
-  @keyframes confetti {{
-    from{{ transform: translate(-50%,-50%) rotate(0deg); }}
-    to{{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(540deg); opacity: 0; }}
-  }}
+  }
+  @keyframes confetti {
+    from{ transform: translate(-50%,-50%) rotate(0deg); }
+    to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(540deg); opacity: 0; }
+  }
 
-  /* Modal */
-  .modalBack {{
+  .modalBack {
     position:fixed; inset:0;
     display:none;
     z-index: 60;
@@ -433,16 +433,16 @@ html = f"""
     align-items:center;
     justify-content:center;
     padding: 18px;
-  }}
-  .modal {{
+  }
+  .modal {
     width: min(560px, 96vw);
     border-radius: 22px;
     border: 1px solid rgba(255,255,255,.25);
     background: rgba(255,255,255,.14);
     box-shadow: 0 30px 90px rgba(0,0,0,.55);
     overflow:hidden;
-  }}
-  .modalTop {{
+  }
+  .modalTop {
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -450,39 +450,39 @@ html = f"""
     padding: 12px 14px;
     background: rgba(255,255,255,.14);
     border-bottom: 1px solid rgba(255,255,255,.18);
-  }}
-  .closeBtn {{
+  }
+  .closeBtn {
     border:1px solid rgba(255,255,255,.25);
     background: rgba(255,255,255,.16);
-    color: var(--text);
+    color: rgba(255,255,255,.95);
     padding: 8px 10px;
     border-radius: 999px;
     cursor:pointer;
     font-weight: 900;
-  }}
-  .modalBody {{
+  }
+  .modalBody {
     padding: 14px;
     display:flex;
     gap: 12px;
     align-items:flex-start;
-  }}
-  .modalImg {{
+  }
+  .modalImg {
     width: 150px;
     height: 150px;
     border-radius: 20px;
     object-fit: cover;
     border: 1px solid rgba(255,255,255,.22);
     background: rgba(255,255,255,.10);
-  }}
-  .modalText {{
+  }
+  .modalText {
     display:flex;
     flex-direction:column;
     gap: 6px;
     min-width: 0;
-  }}
-  .modalText .d {{ font-size: 12px; color: rgba(255,255,255,.80); }}
-  .modalText .t {{ font-size: 18px; font-weight: 900; line-height: 1.1; }}
-  .modalText .p {{ font-size: 13px; color: rgba(255,255,255,.90); line-height: 1.45; }}
+  }
+  .modalText .d { font-size: 12px; color: rgba(255,255,255,.80); }
+  .modalText .t { font-size: 18px; font-weight: 900; line-height: 1.1; }
+  .modalText .p { font-size: 13px; color: rgba(255,255,255,.90); line-height: 1.45; }
 </style>
 </head>
 
@@ -492,7 +492,7 @@ html = f"""
   <div class="hud">
     <div class="pill">
       <div class="title">💝 Open gifts to unlock memories</div>
-      <div class="tiny" id="counter">0 / {len(payload)} opened</div>
+      <div class="tiny" id="counter">0 / __TOTAL__ opened</div>
     </div>
     <div class="pill">
       <button class="btn" id="left">⬅️</button>
@@ -528,7 +528,7 @@ html = f"""
   </div>
 
 <script>
-  // --- Generate floating hearts + sparkles ---
+  // --- Floating hearts + sparkles ---
   const heartIcons = ["❤","💗","💖","💞","💕"];
   for(let i=0;i<26;i++){
     const h = document.createElement("div");
@@ -550,8 +550,8 @@ html = f"""
     document.body.appendChild(s);
   }
 
-  // Data
-  const STAGES = {payload};
+  // Data (injected safely)
+  const STAGES = __PAYLOAD__;
 
   // Local progress
   const KEY = "mz_pink_valentine_opened_v1";
@@ -610,7 +610,7 @@ html = f"""
 
   function openModal(s){
     mImg.src = s.img || "";
-    mDate.textContent = s.date;    // date shown here only
+    mDate.textContent = s.date;
     mHead.textContent = s.title;
     mDesc.textContent = s.desc;
     modalBack.style.display = "flex";
@@ -685,6 +685,9 @@ html = f"""
 </body>
 </html>
 """
+
+# Inject safely (NO f-string)
+html = html.replace("__PAYLOAD__", payload_json).replace("__TOTAL__", str(total_count))
 
 st.components.v1.html(html, height=800, scrolling=False)
 st.caption("✅ Date is NOT written on photos. Date is shown only in the UI (badge + popup).")

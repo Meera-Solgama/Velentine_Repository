@@ -74,8 +74,8 @@ stages = [
 payload = [{**s, "img": to_data_uri(ASSETS / s["ai"])} for s in stages]
 payload_json = json.dumps(payload)
 
-# (No boring captions here)
-st.markdown("## 💖 Meera ❤ Zeel — Love River Flight")
+# keep streamlit page clean
+st.markdown("")
 
 html = r"""
 <!doctype html>
@@ -85,25 +85,23 @@ html = r"""
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
   :root{
-    --ink: rgba(20, 30, 60, .92);
-    --muted: rgba(40, 60, 90, .68);
-    --glass: rgba(255,255,255,.52);
-    --stroke: rgba(255,255,255,.70);
-    --shadow: 0 18px 70px rgba(30, 70, 140, .16);
+    --ink: rgba(55, 15, 35, .92);
+    --muted: rgba(85, 25, 55, .68);
+    --shadow: 0 18px 70px rgba(170, 40, 95, .14);
   }
   html, body { height:100%; }
   *{ box-sizing:border-box; }
+
+  /* MAIN BODY = LIGHT PINK */
   body{
     margin:0;
     overflow:hidden;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color: var(--ink);
-
-    /* LIGHT BLUE FULL BACKGROUND */
     background:
-      radial-gradient(1200px 700px at 18% 15%, rgba(255,255,255,.70), transparent 60%),
+      radial-gradient(1200px 700px at 18% 15%, rgba(255,255,255,.72), transparent 60%),
       radial-gradient(900px 650px at 85% 25%, rgba(255,255,255,.55), transparent 62%),
-      linear-gradient(135deg, #eaf6ff, #d7f0ff, #e9f3ff, #f3fbff);
+      linear-gradient(135deg, #ffe8f1, #ffd4e7, #ffe0ef, #fff2f8);
   }
 
   /* Red glitter hearts across full background */
@@ -114,7 +112,7 @@ html = r"""
     z-index:-4;
     pointer-events:none;
     animation: floatUp linear infinite;
-    filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
+    filter: drop-shadow(0 10px 14px rgba(0,0,0,.10));
   }
   .heart::after{
     content:"❤";
@@ -125,23 +123,23 @@ html = r"""
     color: transparent;
     text-shadow:
       0 0 6px rgba(255,0,80,.45),
-      0 0 12px rgba(255,0,80,.22);
+      0 0 12px rgba(255,0,80,.18);
   }
   @keyframes floatUp{
     0%   { transform: translateY(0) translateX(0) scale(.75) rotate(0deg); opacity: 0; }
-    12%  { opacity: .85; }
+    12%  { opacity: .88; }
     100% { transform: translateY(-125vh) translateX(var(--dx)) scale(1.35) rotate(18deg); opacity: 0; }
   }
 
-  /* Glitter sparkles */
+  /* sparkles */
   .spark{
     position:fixed;
     width: 5px; height: 5px;
     border-radius: 999px;
     background: rgba(255, 40, 120, .85);
     box-shadow:
-      0 0 10px rgba(255,0,90,.35),
-      0 0 18px rgba(255,0,90,.18);
+      0 0 10px rgba(255,0,90,.30),
+      0 0 18px rgba(255,0,90,.14);
     opacity: 0;
     z-index:-3;
     pointer-events:none;
@@ -153,41 +151,55 @@ html = r"""
     60%     { transform: scale(1.35); opacity: .95; }
   }
 
-  /* Simple HUD - only counter (no boring lines) */
+  /* HUD with lovely heading */
   .hud{
     position:fixed; left: 14px; right:14px; top:12px;
     z-index:30;
     display:flex; justify-content:space-between; align-items:center; gap:12px;
   }
   .pill{
-    background: rgba(255,255,255,.55);
-    border: 1px solid rgba(255,255,255,.80);
+    background: rgba(255,255,255,.62);
+    border: 1px solid rgba(255,255,255,.82);
     border-radius: 999px;
     padding: 10px 14px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 14px 50px rgba(30, 70, 140, .10);
+    box-shadow: 0 14px 50px rgba(170, 40, 95, .10);
     display:flex; gap:10px; align-items:center;
     min-height: 44px;
     white-space: nowrap;
   }
-  .title{ font-weight: 950; letter-spacing:.2px; color: rgba(20,40,70,.92); }
-  .tiny{ font-size: 12px; color: var(--muted); }
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .brandTop{
+    font-weight: 980;
+    letter-spacing:.2px;
+    color: rgba(65, 15, 40, .95);
+  }
+  .brandSub{
+    font-size: 12px;
+    color: rgba(105, 30, 70, .72);
+    margin-top:-2px;
+  }
+  .tiny{ font-size: 12px; color: rgba(105, 30, 70, .72); }
 
   .wrap{
     position:fixed; inset:0;
-    padding: 70px 12px 14px;
+    padding: 78px 12px 14px;
     display:flex;
     flex-direction:column;
     gap: 12px;
   }
 
-  /* Map area - soft glass (not dark / not gray) */
+  /* MAP box = SOFT LIGHT BLUE GLASS */
   .map{
     flex:1;
     position:relative;
     border-radius: 28px;
-    background: rgba(255,255,255,.20);
-    border: 1px solid rgba(255,255,255,.55);
+    background: rgba(220, 245, 255, .38);
+    border: 1px solid rgba(255,255,255,.68);
     overflow:hidden;
     box-shadow: var(--shadow);
   }
@@ -207,31 +219,31 @@ html = r"""
     place-items:center;
     cursor:pointer;
     user-select:none;
-    background: rgba(255,255,255,.70);
-    border: 1px solid rgba(255,255,255,.88);
-    box-shadow: 0 16px 40px rgba(30, 70, 140, .12);
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(255,255,255,.92);
+    box-shadow: 0 16px 40px rgba(160, 50, 100, .10);
     transition: transform .15s ease, background .15s ease, outline .15s ease;
   }
-  .stop:hover{ transform: translate(-50%, -50%) scale(1.06); background: rgba(255,255,255,.84); }
-  .stop .n{ font-weight: 950; font-size: 12px; color: rgba(30, 60, 95, .92); }
-  .stop.active{ outline: 4px solid rgba(255, 0, 90, .14); background: rgba(255,255,255,.92); }
-  .stop.opened{ border-color: rgba(255,0,90,.20); background: rgba(255,245,252,.95); }
+  .stop:hover{ transform: translate(-50%, -50%) scale(1.06); background: rgba(255,255,255,.92); }
+  .stop .n{ font-weight: 980; font-size: 12px; color: rgba(70, 20, 50, .92); }
+  .stop.active{ outline: 4px solid rgba(255, 0, 90, .14); background: rgba(255,255,255,.98); }
+  .stop.opened{ border-color: rgba(255,0,90,.20); background: rgba(255,245,252,.98); }
 
   .hint{
     position:absolute;
     left: 50%;
     top: -36px;
     transform: translateX(-50%);
-    background: rgba(255,255,255,.92);
-    border: 1px solid rgba(255,255,255,.92);
+    background: rgba(255,255,255,.95);
+    border: 1px solid rgba(255,255,255,.95);
     padding: 6px 10px;
     border-radius: 999px;
     font-size: 12px;
-    color: rgba(30, 60, 95, .82);
+    color: rgba(75, 22, 55, .82);
     opacity: 0;
     white-space: nowrap;
     transition: opacity .15s ease;
-    box-shadow: 0 12px 30px rgba(30, 70, 140, .10);
+    box-shadow: 0 12px 30px rgba(160,50,100,.10);
     pointer-events:none;
   }
   .stop:hover .hint{ opacity: 1; }
@@ -242,66 +254,47 @@ html = r"""
     font-size: 34px;
     transform: translate(-50%, -50%);
     z-index: 20;
-    filter: drop-shadow(0 18px 25px rgba(30, 70, 140, .14));
+    filter: drop-shadow(0 18px 25px rgba(160,50,100,.10));
     will-change: left, top;
   }
 
-  /* Bottom info (no boring captions, only current event) */
+  /* Bottom current event (short + clean) */
   .bar{
-    background: rgba(255,255,255,.55);
-    border: 1px solid rgba(255,255,255,.80);
+    background: rgba(255,255,255,.62);
+    border: 1px solid rgba(255,255,255,.82);
     border-radius: 18px;
     padding: 10px 12px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 14px 50px rgba(30, 70, 140, .10);
+    box-shadow: 0 14px 50px rgba(170, 40, 95, .08);
     display:flex;
     justify-content:space-between;
     align-items:center;
     gap: 12px;
   }
   .nowTitle{
-    font-weight: 950;
+    font-weight: 980;
     font-size: 14px;
     padding: 6px 12px;
     border-radius: 999px;
-    background: rgba(255,255,255,.80);
-    border: 1px solid rgba(255,255,255,.92);
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(255,255,255,.95);
     width: fit-content;
-    color: rgba(20,40,70,.92);
+    color: rgba(65, 15, 40, .95);
   }
-  .nowSub{ font-size: 12px; color: var(--muted); }
+  .nowSub{ font-size: 12px; color: rgba(105, 30, 70, .72); }
 
-  /* --- Gift Boxes (rain + scattered) --- */
-  .gift{
-    position:absolute;
-    width: 42px; height: 42px;
-    border-radius: 14px;
-    background: rgba(255,255,255,.85);
-    border: 1px solid rgba(255,255,255,.92);
-    box-shadow: 0 16px 40px rgba(30, 70, 140, .12);
-    display:grid;
-    place-items:center;
-    cursor:pointer;
-    user-select:none;
-    transform: translate(-50%, -50%);
-    transition: transform .12s ease;
-    z-index: 25;
-  }
-  .gift:hover{ transform: translate(-50%, -50%) scale(1.05) rotate(-1deg); }
-  .gift .emoji{ font-size: 22px; }
-
-  /* Falling gifts */
+  /* Falling gifts ONLY (rain) */
   .giftFall{
     position:fixed;
-    top:-60px;
+    top:-70px;
     width: 46px; height: 46px;
     border-radius: 16px;
-    background: rgba(255,255,255,.85);
-    border: 1px solid rgba(255,255,255,.92);
-    box-shadow: 0 16px 40px rgba(30, 70, 140, .10);
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(255,255,255,.94);
+    box-shadow: 0 16px 40px rgba(160,50,100,.08);
     display:grid;
     place-items:center;
-    z-index: 12;
+    z-index: 60;
     cursor:pointer;
     user-select:none;
     animation: fall linear forwards;
@@ -309,18 +302,18 @@ html = r"""
   }
   @keyframes fall{
     from{ transform: translateX(-50%) translateY(0) rotate(0deg); }
-    to  { transform: translateX(-50%) translateY(120vh) rotate(12deg); }
+    to  { transform: translateX(-50%) translateY(130vh) rotate(14deg); }
   }
 
-  /* Gift blast */
+  /* blast particles */
   .burst{
     position:fixed;
     width: 10px; height: 10px;
     border-radius: 999px;
     background: rgba(255,0,90,.85);
-    box-shadow: 0 0 10px rgba(255,0,90,.35);
+    box-shadow: 0 0 10px rgba(255,0,90,.28);
     pointer-events:none;
-    z-index: 200;
+    z-index: 500;
     animation: burst .85s ease forwards;
   }
   @keyframes burst{
@@ -328,22 +321,22 @@ html = r"""
     to  { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2); opacity: 0; }
   }
 
-  /* Memory overlay (light blue, not gray) */
+  /* Memory overlay */
   .overlay{
     position:fixed; inset:0;
     display:none;
     align-items:center; justify-content:center;
-    background: rgba(200, 235, 255, .40);
+    background: rgba(255, 200, 220, .35);
     backdrop-filter: blur(10px);
-    z-index: 80;
+    z-index: 120;
     padding: 18px;
   }
   .card{
     width: min(880px, 96vw);
     border-radius: 26px;
-    background: rgba(255,255,255,.78);
-    border: 1px solid rgba(255,255,255,.92);
-    box-shadow: 0 22px 90px rgba(30, 70, 140, .16);
+    background: rgba(255,255,255,.82);
+    border: 1px solid rgba(255,255,255,.95);
+    box-shadow: 0 22px 90px rgba(160, 50, 100, .14);
     overflow:hidden;
     transform: scale(.98);
     animation: pop .16s ease forwards;
@@ -353,17 +346,17 @@ html = r"""
   .cardTop{
     display:flex; justify-content:space-between; align-items:center; gap:12px;
     padding: 12px 14px;
-    background: rgba(255,255,255,.62);
-    border-bottom: 1px solid rgba(255,255,255,.85);
+    background: rgba(255,255,255,.66);
+    border-bottom: 1px solid rgba(255,255,255,.90);
   }
   .x{
     cursor:pointer;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.92);
-    background: rgba(255,255,255,.78);
-    color: rgba(20,40,70,.92);
+    border: 1px solid rgba(255,255,255,.95);
+    background: rgba(255,255,255,.86);
+    color: rgba(65, 15, 40, .95);
     padding: 8px 12px;
-    font-weight: 950;
+    font-weight: 980;
   }
 
   .cardBody{
@@ -385,17 +378,17 @@ html = r"""
     height: clamp(270px, 42vh, 410px);
     object-fit: cover;
     border-radius: 22px;
-    border: 1px solid rgba(255,255,255,.92);
-    background: rgba(255,255,255,.65);
+    border: 1px solid rgba(255,255,255,.95);
+    background: rgba(255,255,255,.70);
     transform: translateZ(16px);
-    box-shadow: 0 18px 55px rgba(30, 70, 140, .14);
+    box-shadow: 0 18px 55px rgba(160,50,100,.10);
     display:block;
   }
   .shine{
     position:absolute;
     inset:0;
     border-radius: 22px;
-    background: radial-gradient(600px 220px at var(--mx,50%) var(--my,30%), rgba(255,0,90,.16), transparent 60%);
+    background: radial-gradient(600px 220px at var(--mx,50%) var(--my,30%), rgba(255,0,90,.14), transparent 60%);
     mix-blend-mode: multiply;
     pointer-events:none;
     opacity:.75;
@@ -406,72 +399,69 @@ html = r"""
     width:fit-content;
     padding: 7px 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,.85);
-    border: 1px solid rgba(255,255,255,.92);
+    background: rgba(255,255,255,.90);
+    border: 1px solid rgba(255,255,255,.95);
     font-size: 12px;
-    color: rgba(20,40,70,.78);
+    color: rgba(105, 30, 70, .72);
   }
-  .head{ font-size: 24px; font-weight: 950; line-height: 1.08; color: rgba(20,40,70,.95); }
-  .desc{ font-size: 14px; line-height: 1.6; color: rgba(30,60,90,.84); }
+  .head{ font-size: 24px; font-weight: 980; line-height: 1.08; color: rgba(65,15,40,.95); }
+  .desc{ font-size: 14px; line-height: 1.6; color: rgba(85,25,55,.84); }
 
   @media (max-width: 860px){
     .cardBody{ grid-template-columns: 1fr; }
     .midImg{ height: clamp(250px, 36vh, 350px); }
   }
 
-  /* --- Envelope Wish Modal --- */
+  /* Wish Envelope modal */
   .wishBack{
     position:fixed; inset:0;
     display:none;
     align-items:center; justify-content:center;
-    background: rgba(200,235,255,.38);
+    background: rgba(255, 200, 220, .35);
     backdrop-filter: blur(10px);
-    z-index: 120;
+    z-index: 200;
     padding: 18px;
   }
   .envelope{
     width: min(560px, 94vw);
     border-radius: 26px;
-    background: rgba(255,255,255,.82);
-    border: 1px solid rgba(255,255,255,.92);
-    box-shadow: 0 24px 90px rgba(30,70,140,.18);
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(255,255,255,.95);
+    box-shadow: 0 24px 90px rgba(160,50,100,.14);
     overflow:hidden;
     transform: translateY(10px) scale(.98);
     animation: envPop .18s ease forwards;
   }
   @keyframes envPop{ to{ transform: translateY(0) scale(1); } }
-
   .envTop{
     padding: 12px 14px;
     display:flex; align-items:center; justify-content:space-between;
-    background: rgba(255,255,255,.60);
-    border-bottom: 1px solid rgba(255,255,255,.85);
+    background: rgba(255,255,255,.70);
+    border-bottom: 1px solid rgba(255,255,255,.92);
   }
   .envTitle{
-    font-weight: 950;
-    color: rgba(20,40,70,.92);
+    font-weight: 980;
+    color: rgba(65,15,40,.92);
     display:flex; gap:8px; align-items:center;
   }
-  .envBody{
-    padding: 16px 16px 18px;
-  }
+  .envBody{ padding: 16px 16px 18px; }
   .wishCard{
     border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255,220,235,.60), rgba(255,255,255,.75));
-    border: 1px solid rgba(255,255,255,.85);
+    background: linear-gradient(135deg, rgba(255,220,235,.70), rgba(255,255,255,.82));
+    border: 1px solid rgba(255,255,255,.92);
     padding: 14px 14px;
-    color: rgba(20,40,70,.90);
-    box-shadow: 0 14px 40px rgba(30,70,140,.10);
+    color: rgba(65,15,40,.90);
+    box-shadow: 0 14px 40px rgba(160,50,100,.08);
   }
-  .wishLine1{ font-weight: 950; font-size: 16px; }
-  .wishLine2{ margin-top: 8px; font-size: 14px; line-height: 1.6; color: rgba(30,60,90,.84); }
+  .wishLine1{ font-weight: 980; font-size: 16px; }
+  .wishLine2{ margin-top: 8px; font-size: 14px; line-height: 1.6; color: rgba(85,25,55,.84); }
 </style>
 </head>
 
 <body>
 <script>
-  // Background hearts + sparkles
-  const heartCount = 52;
+  // background hearts + sparkles
+  const heartCount = 56;
   for(let i=0;i<heartCount;i++){
     const h = document.createElement("div");
     h.className = "heart";
@@ -482,7 +472,7 @@ html = r"""
     h.style.animationDelay = (Math.random()*6) + "s";
     document.body.appendChild(h);
   }
-  const sparkCount = 36;
+  const sparkCount = 34;
   for(let i=0;i<sparkCount;i++){
     const s = document.createElement("div");
     s.className = "spark";
@@ -496,62 +486,60 @@ html = r"""
 
   <div class="hud">
     <div class="pill">
-      <div class="title">💖 Meera ❤ Zeel</div>
-      <div class="tiny" id="counter">0 opened</div>
+      <div class="brand">
+        <div class="brandTop">Let’s Travel Love Story ✈️💖 — Meera ❤ Zeel</div>
+        <div class="brandSub">Tap any stop • gifts rain = surprise wishes</div>
+      </div>
     </div>
     <div class="pill">
-      <div class="tiny" id="currentTiny">✈️ Love River Journey</div>
+      <div class="tiny" id="counter">0 opened</div>
     </div>
   </div>
 
   <div class="wrap">
     <div class="map" id="map">
-      <!-- River path -->
+      <!-- river path -->
       <svg class="riverSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <!-- under glow -->
         <path d="M50,5
                  C30,12 72,18 50,25
                  C28,32 74,40 52,48
                  C30,56 70,63 50,72
                  C30,80 72,88 50,95"
-              fill="none" stroke="rgba(255,255,255,.65)" stroke-width="12" stroke-linecap="round"/>
-        <!-- main river -->
+              fill="none" stroke="rgba(255,255,255,.70)" stroke-width="12" stroke-linecap="round"/>
         <path d="M50,5
                  C30,12 72,18 50,25
                  C28,32 74,40 52,48
                  C30,56 70,63 50,72
                  C30,80 72,88 50,95"
-              fill="none" stroke="rgba(120, 190, 255, .58)" stroke-width="8" stroke-linecap="round"/>
-        <!-- sparkle line -->
+              fill="none" stroke="rgba(115, 205, 255, .58)" stroke-width="8" stroke-linecap="round"/>
         <path d="M50,5
                  C30,12 72,18 50,25
                  C28,32 74,40 52,48
                  C30,56 70,63 50,72
                  C30,80 72,88 50,95"
-              fill="none" stroke="rgba(255,255,255,.65)" stroke-width="1.3" stroke-dasharray="3 4" stroke-linecap="round"/>
+              fill="none" stroke="rgba(255,255,255,.70)" stroke-width="1.3" stroke-dasharray="3 4" stroke-linecap="round"/>
       </svg>
 
       <div class="plane" id="plane">✈️</div>
       <div id="stopsLayer"></div>
-      <div id="giftLayer"></div>
     </div>
 
     <div class="bar">
       <div>
         <div class="nowTitle" id="nowTitle">Current: —</div>
-        <div class="nowSub" id="nowSub">Tap any stop or gifts 🎁</div>
+        <div class="nowSub" id="nowSub">Tap any stop</div>
       </div>
-      <div class="tiny" id="miniNote">💌 Gifts give surprise wishes</div>
+      <div class="tiny">💝 Tap falling gifts too</div>
     </div>
   </div>
 
-  <!-- Memory overlay -->
+  <!-- memory overlay -->
   <div class="overlay" id="overlay">
     <div class="card" id="card">
       <div class="cardTop">
         <div style="display:flex; gap:10px; align-items:center;">
           <div class="date" id="cDate"></div>
-          <div style="font-weight:950; color:rgba(20,40,70,.90);" id="cSmall"></div>
+          <div style="font-weight:980; color:rgba(65,15,40,.90);" id="cSmall"></div>
         </div>
         <button class="x" id="close">✕</button>
       </div>
@@ -571,7 +559,7 @@ html = r"""
     </div>
   </div>
 
-  <!-- Wish envelope modal -->
+  <!-- wish envelope -->
   <div class="wishBack" id="wishBack">
     <div class="envelope">
       <div class="envTop">
@@ -590,20 +578,18 @@ html = r"""
 <script>
   const STAGES = __PAYLOAD__;
 
-  // Wishes for gifts
   const WISHES = [
     "Happy Valentine’s Day! 💖 You two are the cutest love story — keep choosing each other every day.",
     "Your bond feels like home 🏡💞. May your love stay soft, silly, and strong forever.",
     "To Meera ❤ Zeel: May your smiles stay in sync and your hearts stay in one team 💘",
     "Love is not perfect — it’s beautiful because you both try 💗 Happy Valentine’s Day!",
     "You both are the kind of couple that makes love look easy 😄💖 Stay happy always!",
-    "A little drama, a lot of laughter, and infinite love 💞 That’s you two! Happy Valentine!",
     "From first meet to forever vibes ✨💘 Keep flying together!",
     "May your love be sweet like chocolate 🍫 and warm like hugs 🤗💗"
   ];
+  const GIFT_EMOJI = ["🎁","💝","🎁","💝","🎀"];
 
-  // Save opened stops
-  const KEY = "mz_love_river_v2";
+  const KEY = "mz_love_river_v3";
   let opened = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
 
   const counter = document.getElementById("counter");
@@ -611,7 +597,6 @@ html = r"""
   const nowSub = document.getElementById("nowSub");
 
   const stopsLayer = document.getElementById("stopsLayer");
-  const giftLayer = document.getElementById("giftLayer");
   const plane = document.getElementById("plane");
 
   const overlay = document.getElementById("overlay");
@@ -630,7 +615,7 @@ html = r"""
   const wishL1 = document.getElementById("wishL1");
   const wishL2 = document.getElementById("wishL2");
 
-  // Stop positions (vertical river)
+  // stops positions along river
   const POS = [
     {x:50, y:8},
     {x:40, y:15},
@@ -646,6 +631,12 @@ html = r"""
     {x:50, y:93},
     {x:55, y:97},
   ].slice(0, STAGES.length);
+
+  // plane starts "aside" so it doesn't cover stop 1
+  let planePos = {
+    x: Math.max(6, POS[0].x - 12),
+    y: POS[0].y
+  };
 
   let idx = 0;
   let anim = null;
@@ -681,29 +672,27 @@ html = r"""
 
     overlay.style.display = "flex";
   }
-
   closeBtn.addEventListener("click", closeMemory);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeMemory(); });
 
-  // Plane fly + delay open
+  // Plane fly from planePos -> target stop
   function flyTo(targetIdx, openAfter=false){
     targetIdx = Math.max(0, Math.min(STAGES.length-1, targetIdx));
-    const from = POS[idx];
+    const from = {x: planePos.x, y: planePos.y};
     const to = POS[targetIdx];
 
     if(anim) cancelAnimationFrame(anim);
 
-    // Update current immediately
     idx = targetIdx;
     setActiveStop(idx);
+
     const s = STAGES[idx];
     nowTitle.textContent = `Current: Stop ${idx+1} — ${s.title}`;
     nowSub.textContent = s.date;
 
-    // duration based on distance
     const dx = (to.x - from.x), dy = (to.y - from.y);
     const dist = Math.sqrt(dx*dx + dy*dy);
-    const dur = Math.min(1200, Math.max(650, dist * 26));
+    const dur = Math.min(1250, Math.max(650, dist * 26));
     const start = performance.now();
     const ease = (t) => 1 - Math.pow(1 - t, 3);
     const arc = Math.max(1.8, Math.min(6, dist/5));
@@ -711,6 +700,7 @@ html = r"""
     function step(now){
       const t = Math.min(1, (now - start) / dur);
       const e = ease(t);
+
       const x = from.x + (to.x - from.x) * e;
       const y = from.y + (to.y - from.y) * e - Math.sin(Math.PI * e) * arc;
 
@@ -720,6 +710,7 @@ html = r"""
       if(t < 1){
         anim = requestAnimationFrame(step);
       }else{
+        planePos = {x: to.x, y: to.y}; // update real plane position
         plane.style.left = to.x + "%";
         plane.style.top  = to.y + "%";
         if(openAfter){
@@ -753,7 +744,7 @@ html = r"""
     setActiveStop(0);
   }
 
-  // --- 3D tilt photo ---
+  // 3D tilt photo
   function resetTilt(){
     photo3d.style.transform = "rotateX(0deg) rotateY(0deg)";
     shine.style.setProperty("--mx", "50%");
@@ -771,19 +762,18 @@ html = r"""
   });
   photo3d.addEventListener("mouseleave", resetTilt);
 
-  // --- Gift wishes (envelope) ---
-  function closeWish(){ wishBack.style.display = "none"; }
+  // Wish envelope
   function openWish(){
-    const msg = WISHES[Math.floor(Math.random()*WISHES.length)];
     wishL1.textContent = "To Meera ❤ Zeel";
-    wishL2.textContent = msg;
+    wishL2.textContent = WISHES[Math.floor(Math.random()*WISHES.length)];
     wishBack.style.display = "flex";
   }
+  function closeWish(){ wishBack.style.display = "none"; }
   wishClose.addEventListener("click", closeWish);
   wishBack.addEventListener("click", (e)=>{ if(e.target === wishBack) closeWish(); });
 
+  // Blast particles
   function blastAt(clientX, clientY){
-    // burst particles
     for(let i=0;i<18;i++){
       const p = document.createElement("div");
       p.className = "burst";
@@ -796,34 +786,13 @@ html = r"""
     }
   }
 
-  // scattered gifts on map
-  function buildStaticGifts(){
-    giftLayer.innerHTML = "";
-    const points = [
-      {x:14, y:16}, {x:84, y:22}, {x:18, y:62}, {x:84, y:70}, {x:12, y:86}
-    ];
-    points.forEach((p)=>{
-      const g = document.createElement("div");
-      g.className = "gift";
-      g.style.left = p.x + "%";
-      g.style.top  = p.y + "%";
-      g.innerHTML = `<div class="emoji">🎁</div>`;
-      g.addEventListener("click", (e)=>{
-        e.stopPropagation();
-        blastAt(e.clientX, e.clientY);
-        openWish();
-      });
-      giftLayer.appendChild(g);
-    });
-  }
-
-  // falling gifts rain
+  // Many raining gifts
   function spawnFallingGift(){
     const g = document.createElement("div");
     g.className = "giftFall";
     g.style.left = (Math.random()*100) + "vw";
-    g.style.animationDuration = (4.6 + Math.random()*3.4) + "s";
-    g.innerHTML = `<div style="font-size:22px;">🎁</div>`;
+    g.style.animationDuration = (3.8 + Math.random()*3.6) + "s";
+    g.innerHTML = `<div style="font-size:22px;">${GIFT_EMOJI[Math.floor(Math.random()*GIFT_EMOJI.length)]}</div>`;
     g.addEventListener("click", (e)=>{
       e.stopPropagation();
       blastAt(e.clientX, e.clientY);
@@ -833,18 +802,15 @@ html = r"""
     document.body.appendChild(g);
     setTimeout(()=> g.remove(), 9000);
   }
-  setInterval(spawnFallingGift, 1100);
+  // faster rain
+  setInterval(spawnFallingGift, 700);
 
   // Init
   buildStops();
-  buildStaticGifts();
-
-  // start plane at first stop
-  plane.style.left = POS[0].x + "%";
-  plane.style.top  = POS[0].y + "%";
+  plane.style.left = planePos.x + "%";
+  plane.style.top  = planePos.y + "%";
   nowTitle.textContent = `Current: Stop 1 — ${STAGES[0].title}`;
   nowSub.textContent = STAGES[0].date;
-
   resetTilt();
   updateCounter();
 </script>
@@ -853,4 +819,4 @@ html = r"""
 """
 
 html = html.replace("__PAYLOAD__", payload_json)
-st.components.v1.html(html, height=860, scrolling=False)
+st.components.v1.html(html, height=880, scrolling=False)

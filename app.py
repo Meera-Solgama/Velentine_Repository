@@ -11,7 +11,10 @@ def to_data_uri(path: Path) -> str:
     if not path.exists():
         return ""
     ext = path.suffix.lower().replace(".", "")
-    mime = "png" if ext == "png" else "jpeg"
+    if ext in ("jpg", "jpeg"):
+        mime = "jpeg"
+    else:
+        mime = "png"
     return f"data:image/{mime};base64," + base64.b64encode(path.read_bytes()).decode("utf-8")
 
 # -----------------------
@@ -71,10 +74,18 @@ stages = [
      "ai":"ai_13_promise.png"},
 ]
 
+# Optional: quick check (comment out if you don't want any messages)
+missing = []
+for s in stages:
+    p = ASSETS / s["ai"]
+    if not p.exists():
+        missing.append(str(p))
+if missing:
+    st.error("Missing images in assets folder:\n" + "\n".join(missing))
+
 payload = [{**s, "img": to_data_uri(ASSETS / s["ai"])} for s in stages]
 payload_json = json.dumps(payload)
 
-# keep streamlit page clean
 st.markdown("")
 
 html = r"""
@@ -151,7 +162,7 @@ html = r"""
     60%     { transform: scale(1.35); opacity: .95; }
   }
 
-  /* HUD with lovely heading */
+  /* HUD with heading */
   .hud{
     position:fixed; left: 14px; right:14px; top:12px;
     z-index:30;
@@ -258,7 +269,7 @@ html = r"""
     will-change: left, top;
   }
 
-  /* Bottom current event (short + clean) */
+  /* Bottom current event */
   .bar{
     background: rgba(255,255,255,.62);
     border: 1px solid rgba(255,255,255,.82);
@@ -283,7 +294,7 @@ html = r"""
   }
   .nowSub{ font-size: 12px; color: rgba(105, 30, 70, .72); }
 
-  /* Falling gifts ONLY (rain) */
+  /* Falling gifts */
   .giftFall{
     position:fixed;
     top:-70px;
@@ -412,7 +423,7 @@ html = r"""
     .midImg{ height: clamp(250px, 36vh, 350px); }
   }
 
-  /* Wish Envelope modal */
+  /* Wish Envelope */
   .wishBack{
     position:fixed; inset:0;
     display:none;
@@ -460,7 +471,7 @@ html = r"""
 
 <body>
 <script>
-  // background hearts + sparkles
+  // hearts + sparkles
   const heartCount = 56;
   for(let i=0;i<heartCount;i++){
     const h = document.createElement("div");
@@ -498,7 +509,6 @@ html = r"""
 
   <div class="wrap">
     <div class="map" id="map">
-      <!-- river path -->
       <svg class="riverSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M50,5
                  C30,12 72,18 50,25
@@ -533,7 +543,6 @@ html = r"""
     </div>
   </div>
 
-  <!-- memory overlay -->
   <div class="overlay" id="overlay">
     <div class="card" id="card">
       <div class="cardTop">
@@ -559,7 +568,6 @@ html = r"""
     </div>
   </div>
 
-  <!-- wish envelope -->
   <div class="wishBack" id="wishBack">
     <div class="envelope">
       <div class="envTop">
@@ -615,7 +623,6 @@ html = r"""
   const wishL1 = document.getElementById("wishL1");
   const wishL2 = document.getElementById("wishL2");
 
-  // stops positions along river
   const POS = [
     {x:50, y:8},
     {x:40, y:15},
@@ -632,13 +639,9 @@ html = r"""
     {x:55, y:97},
   ].slice(0, STAGES.length);
 
-  // plane starts "aside" so it doesn't cover stop 1
-  let planePos = {
-    x: Math.max(6, POS[0].x - 12),
-    y: POS[0].y
-  };
-
+  // plane starts at side (left) so it never hides stop 1
   let idx = 0;
+  let planePos = { x: Math.max(6, POS[0].x - 12), y: POS[0].y };
   let anim = null;
 
   function updateCounter(){
@@ -675,9 +678,15 @@ html = r"""
   closeBtn.addEventListener("click", closeMemory);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeMemory(); });
 
-  // Plane fly from planePos -> target stop
+  // ✅ FIX: If user clicks same stop (especially stop 1), open directly
   function flyTo(targetIdx, openAfter=false){
     targetIdx = Math.max(0, Math.min(STAGES.length-1, targetIdx));
+
+    if(targetIdx === idx){
+      if(openAfter) openMemory();
+      return;
+    }
+
     const from = {x: planePos.x, y: planePos.y};
     const to = POS[targetIdx];
 
@@ -710,7 +719,7 @@ html = r"""
       if(t < 1){
         anim = requestAnimationFrame(step);
       }else{
-        planePos = {x: to.x, y: to.y}; // update real plane position
+        planePos = {x: to.x, y: to.y};
         plane.style.left = to.x + "%";
         plane.style.top  = to.y + "%";
         if(openAfter){
@@ -721,7 +730,6 @@ html = r"""
     anim = requestAnimationFrame(step);
   }
 
-  // Build stops
   function buildStops(){
     stopsLayer.innerHTML = "";
     STAGES.forEach((s, i)=>{
@@ -744,7 +752,7 @@ html = r"""
     setActiveStop(0);
   }
 
-  // 3D tilt photo
+  // 3D tilt
   function resetTilt(){
     photo3d.style.transform = "rotateX(0deg) rotateY(0deg)";
     shine.style.setProperty("--mx", "50%");
@@ -802,7 +810,6 @@ html = r"""
     document.body.appendChild(g);
     setTimeout(()=> g.remove(), 9000);
   }
-  // faster rain
   setInterval(spawnFallingGift, 700);
 
   // Init

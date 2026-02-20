@@ -67,7 +67,7 @@ stages = [
      "ai":"ai_12_06apr.png"},
 
     {"id":"promise","date":"After that ❤️","title":"Promise Bond 🤝💖",
-     "desc":"Best friends → future life partners (no marriage yet)",
+     "desc":"Best friends → future life partners ",
      "ai":"ai_13_promise.png"},
 ]
 
@@ -676,5 +676,3 @@ html = r"""
 
 html = html.replace("__PAYLOAD__", payload_json)
 st.components.v1.html(html, height=840, scrolling=False)
-
-st.caption("✅ No Prev/Next. ✅ Click any stop → plane flies (auto) → small delay → memory opens. ✅ Light pink background + glitter hearts everywhere. ✅ River-like vertical path.")

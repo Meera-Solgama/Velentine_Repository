@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import streamlit as st
 
-st.set_page_config(page_title="Meera ❤ Zeel — Journey Game", layout="wide")
+st.set_page_config(page_title="Meera ❤ Zeel — Love Flight", layout="wide")
 
 ASSETS = Path(__file__).parent / "assets"
 
@@ -15,7 +15,7 @@ def to_data_uri(path: Path) -> str:
     return f"data:image/{mime};base64," + base64.b64encode(path.read_bytes()).decode("utf-8")
 
 # -----------------------
-# STAGES
+# STAGES (Removed 26 Dec 2023 as you said it is NOT an event)
 # -----------------------
 stages = [
     {"id":"req","date":"(No date)","title":"Instagram Request 💌",
@@ -26,9 +26,7 @@ stages = [
      "desc":"Commerce Six Road Metro Station",
      "ai":"ai_01_17dec.png"},
 
-    {"id":"d26","date":"26 Dec 2023","title":"Second Date 😍",
-     "desc":"Second meet — more comfort, more smiles",
-     "ai":"ai_02_26dec.png"},
+    # ❌ Removed: 26 Dec 2023 (not an event)
 
     {"id":"jan6","date":"06 Jan 2024","title":"Ajay’s Cafe ☕",
      "desc":"Coffee + talks + vibes",
@@ -75,13 +73,10 @@ stages = [
      "ai":"ai_13_promise.png"},
 ]
 
-payload = []
-for s in stages:
-    payload.append({**s, "img": to_data_uri(ASSETS / s["ai"])})
-
+payload = [{**s, "img": to_data_uri(ASSETS / s["ai"])} for s in stages]
 payload_json = json.dumps(payload)
 
-st.markdown("## ✈️ Meera ❤ Zeel — Journey Game")
+st.markdown("## ✈️ Meera ❤ Zeel — Love Flight (Game Journey)")
 
 html = r"""
 <!doctype html>
@@ -92,43 +87,57 @@ html = r"""
 <style>
   :root{
     --text: rgba(255,255,255,.96);
-    --muted: rgba(255,255,255,.78);
+    --muted: rgba(255,255,255,.80);
     --glass: rgba(255,255,255,.14);
     --stroke: rgba(255,255,255,.22);
     --shadow: 0 22px 90px rgba(0,0,0,.45);
-    --r: 22px;
-    --accent: rgba(255,255,255,.92);
-    --active: rgba(255,255,255,.30);
   }
-  *{box-sizing:border-box}
+  html, body { height:100%; }
+  *{ box-sizing:border-box; }
   body{
     margin:0;
     overflow:hidden;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color: var(--text);
+    /* Lovely pink + red theme */
     background:
-      radial-gradient(1200px 700px at 18% 12%, rgba(255,255,255,.14), transparent 60%),
-      radial-gradient(1200px 700px at 86% 28%, rgba(255,255,255,.10), transparent 62%),
-      linear-gradient(135deg, #6a5cff, #ff4fb2, #ff7a59);
+      radial-gradient(1200px 700px at 20% 10%, rgba(255,255,255,.12), transparent 60%),
+      radial-gradient(1100px 650px at 85% 30%, rgba(255,255,255,.10), transparent 62%),
+      linear-gradient(135deg, #ff4fa7, #ff2d5f, #ff86b3, #ff3b7a);
   }
 
-  .stars{
-    position:fixed; inset:0;
-    background-image:
-      radial-gradient(2px 2px at 15% 20%, rgba(255,255,255,.9), transparent 60%),
-      radial-gradient(2px 2px at 70% 18%, rgba(255,255,255,.8), transparent 60%),
-      radial-gradient(1.6px 1.6px at 35% 35%, rgba(255,255,255,.7), transparent 60%),
-      radial-gradient(1.8px 1.8px at 90% 40%, rgba(255,255,255,.75), transparent 60%),
-      radial-gradient(1.6px 1.6px at 55% 12%, rgba(255,255,255,.75), transparent 60%),
-      radial-gradient(1.4px 1.4px at 22% 52%, rgba(255,255,255,.6), transparent 60%);
-    opacity:.55;
-    z-index:-3;
+  /* Soft floating glow */
+  .glow{
+    position:fixed; inset:-120px;
+    background:
+      radial-gradient(900px 540px at 12% 20%, rgba(255,255,255,.16), transparent 60%),
+      radial-gradient(900px 540px at 85% 20%, rgba(255,255,255,.12), transparent 60%),
+      radial-gradient(1200px 800px at 50% 95%, rgba(0,0,0,.18), transparent 65%);
+    filter: blur(10px);
+    z-index:-4;
     pointer-events:none;
   }
 
-  .hud{
+  /* Animated hearts in background */
+  .heart{
     position:fixed;
-    left: 14px; right:14px; top: 12px;
+    bottom:-30px;
+    font-size: 18px;
+    opacity: 0;
+    animation: floatUp linear infinite;
+    z-index:-3;
+    filter: drop-shadow(0 12px 22px rgba(0,0,0,.22));
+    pointer-events:none;
+  }
+  @keyframes floatUp{
+    0%   { transform: translateY(0) translateX(0) scale(.7) rotate(0deg); opacity: 0; }
+    10%  { opacity: .78; }
+    100% { transform: translateY(-120vh) translateX(var(--dx)) scale(1.35) rotate(18deg); opacity: 0; }
+  }
+
+  /* HUD */
+  .hud{
+    position:fixed; left:14px; right:14px; top:12px;
     display:flex; justify-content:space-between; align-items:center; gap:12px;
     z-index:30;
   }
@@ -138,12 +147,12 @@ html = r"""
     border-radius: 999px;
     padding: 10px 14px;
     backdrop-filter: blur(12px);
-    box-shadow: 0 12px 40px rgba(0,0,0,.22);
+    box-shadow: 0 12px 40px rgba(0,0,0,.20);
     display:flex; gap:10px; align-items:center;
     min-height: 44px;
     white-space: nowrap;
   }
-  .title{ font-weight: 900; letter-spacing:.2px; }
+  .title{ font-weight: 950; letter-spacing:.2px; }
   .tiny{ font-size: 12px; color: var(--muted); }
   .btn{
     cursor:pointer;
@@ -158,169 +167,140 @@ html = r"""
   .btn:hover{ background: rgba(255,255,255,.18); }
   .btn:active{ transform: scale(.98); }
 
+  /* Map */
   .wrap{
     position:fixed; inset:0;
     padding: 74px 14px 14px;
-    display:flex;
-    flex-direction:column;
-    gap: 12px;
+    display:flex; flex-direction:column; gap:12px;
   }
-
   .map{
-    flex: 1;
+    flex:1;
     position:relative;
     border-radius: 26px;
-    background: rgba(255,255,255,.06);
+    background: rgba(255,255,255,.07);
     border: 1px solid rgba(255,255,255,.16);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     overflow:hidden;
-    box-shadow: 0 26px 90px rgba(0,0,0,.35);
+    box-shadow: 0 26px 90px rgba(0,0,0,.30);
   }
 
   .route{
     position:absolute;
-    left: 6%;
-    right: 6%;
-    top: 52%;
-    height: 0;
-    border-top: 3px dashed rgba(255,255,255,.45);
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,.28));
+    left:6%; right:6%;
+    top:52%;
+    border-top: 3px dashed rgba(255,255,255,.55);
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
   }
 
   .stops{
     position:absolute;
-    left: 6%;
-    right: 6%;
+    left:6%; right:6%;
     top: calc(52% - 32px);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap: 10px;
-    pointer-events:auto;
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px;
   }
 
   .stop{
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     border-radius: 999px;
     background: rgba(255,255,255,.16);
     border: 1px solid rgba(255,255,255,.30);
     backdrop-filter: blur(10px);
-    display:grid;
-    place-items:center;
+    display:grid; place-items:center;
     cursor:pointer;
-    position:relative;
-    box-shadow: 0 12px 35px rgba(0,0,0,.25);
+    box-shadow: 0 12px 35px rgba(0,0,0,.22);
     transition: transform .15s ease, background .15s ease, outline .15s ease;
-    flex: 0 0 auto;
     outline: 0 solid rgba(255,255,255,0);
+    position:relative;
   }
-  .stop:hover{ transform: translateY(-2px) scale(1.03); background: rgba(255,255,255,.22); }
-
+  .stop:hover{ transform: translateY(-2px) scale(1.04); background: rgba(255,255,255,.22); }
   .stop.active{
-    background: rgba(255,255,255,.28);
-    outline: 3px solid rgba(255,255,255,.22);
-    transform: translateY(-3px) scale(1.06);
+    background: rgba(255,255,255,.30);
+    outline: 3px solid rgba(255,255,255,.20);
+    transform: translateY(-3px) scale(1.07);
   }
   .stop.opened{
     background: rgba(255,255,255,.26);
-    border-color: rgba(255,255,255,.40);
+    border-color: rgba(255,255,255,.42);
   }
-  .stop .n{
-    font-weight: 900;
-    font-size: 12px;
-    color: rgba(255,255,255,.95);
-    user-select:none;
-  }
+  .stop .n{ font-weight: 900; font-size: 12px; user-select:none; }
   .stop .hint{
     position:absolute;
-    top: -36px;
-    left: 50%;
+    top:-36px; left:50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,.35);
-    border: 1px solid rgba(255,255,255,.22);
-    color: rgba(255,255,255,.92);
     padding: 6px 10px;
     border-radius: 999px;
+    background: rgba(0,0,0,.34);
+    border: 1px solid rgba(255,255,255,.22);
     font-size: 12px;
     white-space: nowrap;
     opacity: 0;
-    pointer-events:none;
     transition: opacity .15s ease;
+    pointer-events:none;
     backdrop-filter: blur(8px);
   }
   .stop:hover .hint{ opacity: 1; }
 
+  /* Plane + trail */
   .plane{
     position:absolute;
     top: calc(52% - 74px);
     left: 6%;
     font-size: 34px;
     transform: translateX(-50%);
-    filter: drop-shadow(0 18px 26px rgba(0,0,0,.35));
-    z-index: 10;
-    will-change: left;
+    filter: drop-shadow(0 18px 26px rgba(0,0,0,.30));
+    z-index:10;
+    will-change:left;
   }
   .trail{
     position:absolute;
     top: calc(52% - 52px);
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.55), rgba(255,255,255,.0));
-    opacity: .65;
-    filter: blur(.2px);
-    z-index: 9;
     left: 6%;
+    height: 6px;
     width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.65), rgba(255,255,255,.0));
+    opacity: .7;
+    z-index:9;
     transition: width .25s ease;
   }
 
+  /* Bottom info */
   .bar{
     background: var(--glass);
     border: 1px solid var(--stroke);
     border-radius: 18px;
     padding: 10px 12px;
     backdrop-filter: blur(12px);
-    display:flex;
-    gap: 10px;
-    align-items:center;
-    justify-content:space-between;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
   }
-  .nowBox{
-    display:flex; flex-direction:column; gap:2px;
-  }
+  .nowBox{ display:flex; flex-direction:column; gap:2px; }
   .nowTitle{
-    font-size: 14px;
-    font-weight: 950;
-    padding: 4px 10px;
-    border-radius: 999px;
     width: fit-content;
-    background: rgba(255,255,255,.10);
-    border: 1px solid rgba(255,255,255,.14);
-  }
-  .nowTitle.active{
-    background: rgba(255,255,255,.22);
-    border-color: rgba(255,255,255,.22);
-    box-shadow: 0 14px 36px rgba(0,0,0,.18);
+    font-weight: 950;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: 0 14px 36px rgba(0,0,0,.14);
   }
   .nowSub{ font-size: 12px; color: var(--muted); }
 
   /* Overlay */
   .overlay{
-    position:fixed;
-    inset:0;
+    position:fixed; inset:0;
     display:none;
-    align-items:center;
-    justify-content:center;
-    z-index: 80;
+    align-items:center; justify-content:center;
     background: rgba(0,0,0,.45);
-    backdrop-filter: blur(9px);
+    backdrop-filter: blur(10px);
+    z-index:80;
     padding: 18px;
   }
   .card{
     width: min(900px, 96vw);
     border-radius: 26px;
-    background: rgba(255,255,255,.12);
+    background: rgba(255,255,255,.14);
     border: 1px solid rgba(255,255,255,.22);
     box-shadow: var(--shadow);
     overflow:hidden;
@@ -330,10 +310,7 @@ html = r"""
   @keyframes pop{ to{ transform: scale(1); } }
 
   .cardTop{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
     padding: 12px 14px;
     background: rgba(255,255,255,.10);
     border-bottom: 1px solid rgba(255,255,255,.16);
@@ -350,12 +327,29 @@ html = r"""
 
   .cardBody{
     display:grid;
-    grid-template-columns: 1.15fr 1fr;
+    grid-template-columns: 1.1fr 1fr;
     gap: 14px;
     padding: 14px;
   }
 
-  /* MEDIUM IMAGE (not too small not too big) */
+  /* 3D photo wrapper */
+  .photo3d{
+    position:relative;
+    border-radius: 22px;
+    transform-style: preserve-3d;
+    perspective: 900px;
+  }
+  .shine{
+    position:absolute;
+    inset:0;
+    border-radius: 22px;
+    background: radial-gradient(600px 220px at var(--mx,50%) var(--my,30%), rgba(255,255,255,.28), transparent 60%);
+    mix-blend-mode: screen;
+    pointer-events:none;
+    opacity:.65;
+  }
+
+  /* Medium image (clear not too big) */
   .midImg{
     width: 100%;
     height: clamp(280px, 45vh, 420px);
@@ -363,33 +357,25 @@ html = r"""
     border-radius: 22px;
     border: 1px solid rgba(255,255,255,.18);
     background: rgba(255,255,255,.08);
+    transform: translateZ(18px);
+    box-shadow: 0 18px 55px rgba(0,0,0,.25);
+    display:block;
   }
 
   .info{
-    display:flex;
-    flex-direction:column;
-    gap: 10px;
-    min-width:0;
+    display:flex; flex-direction:column; gap: 10px;
   }
   .date{
     width:fit-content;
     padding: 7px 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.16);
     border: 1px solid rgba(255,255,255,.18);
     font-size: 12px;
-    color: rgba(255,255,255,.90);
+    color: rgba(255,255,255,.92);
   }
-  .head{
-    font-size: 24px;
-    font-weight: 950;
-    line-height: 1.08;
-  }
-  .desc{
-    font-size: 14px;
-    line-height: 1.6;
-    color: rgba(255,255,255,.88);
-  }
+  .head{ font-size: 24px; font-weight: 950; line-height: 1.08; }
+  .desc{ font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.90); }
 
   @media (max-width: 860px){
     .cardBody{ grid-template-columns: 1fr; }
@@ -399,11 +385,11 @@ html = r"""
 </head>
 
 <body>
-  <div class="stars"></div>
+  <div class="glow"></div>
 
   <div class="hud">
     <div class="pill">
-      <div class="title">✈️ Plane flies stop → stop (click any stop)</div>
+      <div class="title">💖 Love Flight — click a stop</div>
       <div class="tiny" id="counter">0 opened</div>
     </div>
     <div class="pill">
@@ -423,17 +409,17 @@ html = r"""
 
     <div class="bar">
       <div class="nowBox">
-        <div class="nowTitle active" id="nowTitle">Current: —</div>
+        <div class="nowTitle" id="nowTitle">Current: —</div>
         <div class="nowSub" id="nowSub">Click a stop</div>
       </div>
-      <span class="tiny">Active stop is highlighted • Medium photo viewer</span>
+      <span class="tiny">Active stop highlighted • 3D photo animation</span>
     </div>
   </div>
 
   <div class="overlay" id="overlay">
     <div class="card" id="card">
       <div class="cardTop">
-        <div style="display:flex; gap:10px; align-items:center; min-width:0;">
+        <div style="display:flex; gap:10px; align-items:center;">
           <div class="date" id="cDate"></div>
           <div style="font-weight:900; color:rgba(255,255,255,.92);" id="cSmall"></div>
         </div>
@@ -441,12 +427,16 @@ html = r"""
       </div>
 
       <div class="cardBody">
-        <img class="midImg" id="cImg" src="" alt="memory"/>
+        <div class="photo3d" id="photo3d">
+          <img class="midImg" id="cImg" src="" alt="memory"/>
+          <div class="shine" id="shine"></div>
+        </div>
+
         <div class="info">
           <div class="head" id="cHead"></div>
           <div class="desc" id="cDesc"></div>
           <div class="tiny" style="margin-top:auto;">
-            Tip: Click outside to close • Use Next/Prev to move plane
+            Tip: Click outside to close • Use Next/Prev to fly
           </div>
         </div>
       </div>
@@ -454,17 +444,28 @@ html = r"""
   </div>
 
 <script>
+  // ---- Animated hearts background ----
+  const heartIcons = ["❤","💗","💖","💕","💞"];
+  for(let i=0;i<34;i++){
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.style.left = (Math.random()*100) + "vw";
+    h.style.animationDuration = (6 + Math.random()*8) + "s";
+    h.style.fontSize = (14 + Math.random()*18) + "px";
+    h.style.setProperty("--dx", ((Math.random()*140)-70) + "px");
+    h.innerHTML = heartIcons[Math.floor(Math.random()*heartIcons.length)];
+    document.body.appendChild(h);
+  }
+
   const STAGES = __PAYLOAD__;
 
-  // saved progress
-  const KEY = "mz_game_opened_v3";
+  const KEY = "mz_love_flight_v4";
   let opened = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
 
   const stopsEl = document.getElementById("stops");
   const plane = document.getElementById("plane");
   const trail = document.getElementById("trail");
   const counter = document.getElementById("counter");
-
   const nowTitle = document.getElementById("nowTitle");
   const nowSub = document.getElementById("nowSub");
 
@@ -475,6 +476,9 @@ html = r"""
   const cSmall = document.getElementById("cSmall");
   const cHead = document.getElementById("cHead");
   const cDesc = document.getElementById("cDesc");
+
+  const photo3d = document.getElementById("photo3d");
+  const shine = document.getElementById("shine");
 
   let idx = 0;
   let anim = null;
@@ -499,7 +503,6 @@ html = r"""
     });
   }
 
-  // Smooth plane flight using requestAnimationFrame
   function flyTo(i){
     i = Math.max(0, Math.min(STAGES.length-1, i));
     const from = parseFloat(plane.dataset.pct || pctFor(idx));
@@ -508,23 +511,20 @@ html = r"""
     if(anim) cancelAnimationFrame(anim);
 
     const start = performance.now();
-    const dur = 650; // ms
-    const ease = (t) => 1 - Math.pow(1 - t, 3); // easeOutCubic
+    const dur = 650;
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
 
-    // update current index instantly for correct text highlight
     idx = i;
     setActiveStop(idx);
+
     const s = STAGES[idx];
     nowTitle.textContent = `Current: Stop ${idx+1} — ${s.title}`;
     nowSub.textContent = `${s.date}`;
-
-    // trail width (from 6% to current)
     trail.style.width = (to - 6) + "%";
 
     function step(now){
       const t = Math.min(1, (now - start) / dur);
-      const e = ease(t);
-      const cur = from + (to - from) * e;
+      const cur = from + (to - from) * ease(t);
 
       plane.style.left = cur + "%";
       plane.dataset.pct = cur;
@@ -546,11 +546,9 @@ html = r"""
     opened.add(s.id);
     save();
 
-    // mark opened stop
     const btn = stopsEl.children[idx];
     if(btn) btn.classList.add("opened");
 
-    // medium viewer
     cImg.src = s.img || "";
     cDate.textContent = s.date;
     cSmall.textContent = `Stage ${idx+1} / ${STAGES.length}`;
@@ -560,21 +558,13 @@ html = r"""
     overlay.style.display = "flex";
   }
 
-  function closeStage(){
-    overlay.style.display = "none";
-  }
+  function closeStage(){ overlay.style.display = "none"; }
 
   closeBtn.addEventListener("click", closeStage);
-  overlay.addEventListener("click", (e)=>{
-    if(e.target === overlay) closeStage();
-  });
+  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeStage(); });
 
-  document.getElementById("next").addEventListener("click", ()=>{
-    flyTo(idx+1);
-  });
-  document.getElementById("prev").addEventListener("click", ()=>{
-    flyTo(idx-1);
-  });
+  document.getElementById("next").addEventListener("click", ()=> flyTo(idx+1));
+  document.getElementById("prev").addEventListener("click", ()=> flyTo(idx-1));
   document.getElementById("reset").addEventListener("click", ()=>{
     localStorage.removeItem(KEY);
     opened = new Set();
@@ -599,14 +589,30 @@ html = r"""
     setActiveStop(0);
   }
 
-  buildStops();
-  updateCounter();
+  // 3D tilt effect for photo
+  function resetTilt(){
+    photo3d.style.transform = "rotateX(0deg) rotateY(0deg)";
+    shine.style.setProperty("--mx", "50%");
+    shine.style.setProperty("--my", "30%");
+  }
+  photo3d.addEventListener("mousemove", (e)=>{
+    const r = photo3d.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;  // 0..1
+    const y = (e.clientY - r.top) / r.height;  // 0..1
+    const rotY = (x - 0.5) * 14;   // left/right
+    const rotX = (0.5 - y) * 10;   // up/down
+    photo3d.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    shine.style.setProperty("--mx", (x*100).toFixed(1) + "%");
+    shine.style.setProperty("--my", (y*100).toFixed(1) + "%");
+  });
+  photo3d.addEventListener("mouseleave", resetTilt);
 
-  // init position
+  buildStops();
   plane.dataset.pct = pctFor(0);
   plane.style.left = pctFor(0) + "%";
   trail.style.width = "0%";
   flyTo(0);
+  resetTilt();
 </script>
 </body>
 </html>
@@ -615,4 +621,4 @@ html = r"""
 html = html.replace("__PAYLOAD__", payload_json)
 st.components.v1.html(html, height=820, scrolling=False)
 
-st.caption("✅ Plane flies smoothly stop → stop. ✅ Medium photo viewer. ✅ Active stage highlighted correctly.")
+st.caption("✅ 26 Dec removed. ✅ Pink hearts animated background. ✅ Plane flies. ✅ Medium 3D photo opens. ✅ Active event highlighted.")

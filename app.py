@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import streamlit as st
 
-st.set_page_config(page_title="Meera ❤ Zeel — Love Flight", layout="wide")
+st.set_page_config(page_title="Meera ❤ Zeel — Love River Flight", layout="wide")
 
 ASSETS = Path(__file__).parent / "assets"
 
@@ -15,7 +15,7 @@ def to_data_uri(path: Path) -> str:
     return f"data:image/{mime};base64," + base64.b64encode(path.read_bytes()).decode("utf-8")
 
 # -----------------------
-# STAGES (Removed 26 Dec 2023 as you said it is NOT an event)
+# STAGES (26 Dec REMOVED)
 # -----------------------
 stages = [
     {"id":"req","date":"(No date)","title":"Instagram Request 💌",
@@ -25,8 +25,6 @@ stages = [
     {"id":"d17","date":"17 Dec 2023","title":"First Meet ✨",
      "desc":"Commerce Six Road Metro Station",
      "ai":"ai_01_17dec.png"},
-
-    # ❌ Removed: 26 Dec 2023 (not an event)
 
     {"id":"jan6","date":"06 Jan 2024","title":"Ajay’s Cafe ☕",
      "desc":"Coffee + talks + vibes",
@@ -76,7 +74,7 @@ stages = [
 payload = [{**s, "img": to_data_uri(ASSETS / s["ai"])} for s in stages]
 payload_json = json.dumps(payload)
 
-st.markdown("## ✈️ Meera ❤ Zeel — Love Flight (Game Journey)")
+st.markdown("## 💖 Meera ❤ Zeel — Love River Flight (Click any stop)")
 
 html = r"""
 <!doctype html>
@@ -86,11 +84,11 @@ html = r"""
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
   :root{
-    --text: rgba(255,255,255,.96);
-    --muted: rgba(255,255,255,.80);
-    --glass: rgba(255,255,255,.14);
-    --stroke: rgba(255,255,255,.22);
-    --shadow: 0 22px 90px rgba(0,0,0,.45);
+    --text: rgba(40,10,22,.92);
+    --muted: rgba(70,20,35,.72);
+    --card: rgba(255,255,255,.65);
+    --stroke: rgba(255,255,255,.65);
+    --shadow: 0 18px 70px rgba(120, 20, 60, .18);
   }
   html, body { height:100%; }
   *{ box-sizing:border-box; }
@@ -99,210 +97,208 @@ html = r"""
     overflow:hidden;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color: var(--text);
-    /* Lovely pink + red theme */
+    /* LIGHT PINK full background */
     background:
-      radial-gradient(1200px 700px at 20% 10%, rgba(255,255,255,.12), transparent 60%),
-      radial-gradient(1100px 650px at 85% 30%, rgba(255,255,255,.10), transparent 62%),
-      linear-gradient(135deg, #ff4fa7, #ff2d5f, #ff86b3, #ff3b7a);
+      radial-gradient(1200px 700px at 18% 15%, rgba(255,255,255,.65), transparent 60%),
+      radial-gradient(900px 600px at 80% 25%, rgba(255,255,255,.55), transparent 60%),
+      linear-gradient(135deg, #ffe4ef, #ffd1e6, #ffdbea, #ffeef6);
   }
 
-  /* Soft floating glow */
-  .glow{
-    position:fixed; inset:-120px;
-    background:
-      radial-gradient(900px 540px at 12% 20%, rgba(255,255,255,.16), transparent 60%),
-      radial-gradient(900px 540px at 85% 20%, rgba(255,255,255,.12), transparent 60%),
-      radial-gradient(1200px 800px at 50% 95%, rgba(0,0,0,.18), transparent 65%);
-    filter: blur(10px);
-    z-index:-4;
-    pointer-events:none;
-  }
-
-  /* Animated hearts in background */
+  /* GLITTER HEARTS across WHOLE background */
   .heart{
     position:fixed;
-    bottom:-30px;
-    font-size: 18px;
+    bottom:-40px;
     opacity: 0;
-    animation: floatUp linear infinite;
     z-index:-3;
-    filter: drop-shadow(0 12px 22px rgba(0,0,0,.22));
     pointer-events:none;
+    animation: floatUp linear infinite;
+    filter: drop-shadow(0 10px 14px rgba(0,0,0,.14));
+  }
+  .heart::after{
+    content:"❤";
+    display:block;
+    /* glitter red look */
+    background: linear-gradient(180deg, #ff0a54, #ff3d7f, #ff0a54);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow:
+      0 0 6px rgba(255,0,80,.45),
+      0 0 12px rgba(255,0,80,.25);
   }
   @keyframes floatUp{
-    0%   { transform: translateY(0) translateX(0) scale(.7) rotate(0deg); opacity: 0; }
-    10%  { opacity: .78; }
-    100% { transform: translateY(-120vh) translateX(var(--dx)) scale(1.35) rotate(18deg); opacity: 0; }
+    0%   { transform: translateY(0) translateX(0) scale(.75) rotate(0deg); opacity: 0; }
+    10%  { opacity: .85; }
+    100% { transform: translateY(-125vh) translateX(var(--dx)) scale(1.35) rotate(18deg); opacity: 0; }
   }
 
-  /* HUD */
+  /* tiny glitter sparkles */
+  .spark{
+    position:fixed;
+    width: 5px; height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 40, 120, .85);
+    box-shadow:
+      0 0 10px rgba(255,0,90,.40),
+      0 0 18px rgba(255,0,90,.22);
+    opacity: 0;
+    z-index:-2;
+    pointer-events:none;
+    animation: twinkle ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100% { transform: scale(.7); opacity: 0; }
+    45%     { opacity: .85; }
+    60%     { transform: scale(1.35); opacity: .95; }
+  }
+
+  /* HUD (simple) */
   .hud{
-    position:fixed; left:14px; right:14px; top:12px;
-    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    position:fixed; left: 14px; right:14px; top:12px;
     z-index:30;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
   }
   .pill{
-    background: var(--glass);
-    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.55);
+    border: 1px solid rgba(255,255,255,.75);
     border-radius: 999px;
     padding: 10px 14px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 12px 40px rgba(0,0,0,.20);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 50px rgba(120, 20, 60, .12);
     display:flex; gap:10px; align-items:center;
     min-height: 44px;
     white-space: nowrap;
   }
   .title{ font-weight: 950; letter-spacing:.2px; }
   .tiny{ font-size: 12px; color: var(--muted); }
-  .btn{
-    cursor:pointer;
-    border: 1px solid var(--stroke);
-    background: rgba(255,255,255,.12);
-    color: var(--text);
-    padding: 9px 12px;
-    border-radius: 999px;
-    font-weight: 900;
-    transition: transform .12s ease, background .12s ease;
-  }
-  .btn:hover{ background: rgba(255,255,255,.18); }
-  .btn:active{ transform: scale(.98); }
 
-  /* Map */
   .wrap{
     position:fixed; inset:0;
-    padding: 74px 14px 14px;
-    display:flex; flex-direction:column; gap:12px;
+    padding: 70px 12px 14px;
+    display:flex;
+    flex-direction:column;
+    gap: 12px;
   }
+
+  /* River map area — NOT a dark box */
   .map{
     flex:1;
     position:relative;
-    border-radius: 26px;
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.16);
-    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    background: rgba(255,255,255,.22);
+    border: 1px solid rgba(255,255,255,.55);
     overflow:hidden;
-    box-shadow: 0 26px 90px rgba(0,0,0,.30);
+    box-shadow: var(--shadow);
   }
 
-  .route{
-    position:absolute;
-    left:6%; right:6%;
-    top:52%;
-    border-top: 3px dashed rgba(255,255,255,.55);
-    filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
+  /* River SVG covers map */
+  .riverSvg{
+    position:absolute; inset:0;
+    width:100%; height:100%;
   }
 
-  .stops{
-    position:absolute;
-    left:6%; right:6%;
-    top: calc(52% - 32px);
-    display:flex; justify-content:space-between; align-items:center;
-    gap:10px;
-  }
-
+  /* Stops placed along river */
   .stop{
-    width: 44px; height: 44px;
+    position:absolute;
+    width: 44px; height:44px;
     border-radius: 999px;
-    background: rgba(255,255,255,.16);
-    border: 1px solid rgba(255,255,255,.30);
-    backdrop-filter: blur(10px);
-    display:grid; place-items:center;
+    transform: translate(-50%, -50%);
+    display:grid;
+    place-items:center;
     cursor:pointer;
-    box-shadow: 0 12px 35px rgba(0,0,0,.22);
-    transition: transform .15s ease, background .15s ease, outline .15s ease;
-    outline: 0 solid rgba(255,255,255,0);
-    position:relative;
+    user-select:none;
+    background: rgba(255,255,255,.65);
+    border: 1px solid rgba(255,255,255,.80);
+    box-shadow: 0 16px 40px rgba(120, 20, 60, .14);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
   }
-  .stop:hover{ transform: translateY(-2px) scale(1.04); background: rgba(255,255,255,.22); }
+  .stop:hover{
+    transform: translate(-50%, -50%) scale(1.06);
+    background: rgba(255,255,255,.78);
+  }
+  .stop .n{
+    font-weight: 950;
+    font-size: 12px;
+    color: rgba(120, 10, 40, .92);
+  }
   .stop.active{
-    background: rgba(255,255,255,.30);
-    outline: 3px solid rgba(255,255,255,.20);
-    transform: translateY(-3px) scale(1.07);
+    outline: 4px solid rgba(255, 0, 80, .18);
+    background: rgba(255,255,255,.86);
   }
   .stop.opened{
-    background: rgba(255,255,255,.26);
-    border-color: rgba(255,255,255,.42);
+    background: rgba(255,240,248,.92);
+    border-color: rgba(255, 0, 90, .22);
   }
-  .stop .n{ font-weight: 900; font-size: 12px; user-select:none; }
-  .stop .hint{
+
+  .hint{
     position:absolute;
-    top:-36px; left:50%;
+    left: 50%;
+    top: -36px;
     transform: translateX(-50%);
+    background: rgba(255,255,255,.80);
+    border: 1px solid rgba(255,255,255,.85);
     padding: 6px 10px;
     border-radius: 999px;
-    background: rgba(0,0,0,.34);
-    border: 1px solid rgba(255,255,255,.22);
     font-size: 12px;
-    white-space: nowrap;
+    color: rgba(90, 20, 40, .82);
     opacity: 0;
+    white-space: nowrap;
     transition: opacity .15s ease;
+    box-shadow: 0 12px 30px rgba(120,20,60,.10);
     pointer-events:none;
-    backdrop-filter: blur(8px);
   }
   .stop:hover .hint{ opacity: 1; }
 
-  /* Plane + trail */
+  /* Plane flies along river */
   .plane{
     position:absolute;
-    top: calc(52% - 74px);
-    left: 6%;
     font-size: 34px;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 18px 26px rgba(0,0,0,.30));
-    z-index:10;
-    will-change:left;
-  }
-  .trail{
-    position:absolute;
-    top: calc(52% - 52px);
-    left: 6%;
-    height: 6px;
-    width: 0%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.65), rgba(255,255,255,.0));
-    opacity: .7;
-    z-index:9;
-    transition: width .25s ease;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    filter: drop-shadow(0 18px 25px rgba(120,20,60,.22));
+    will-change: left, top;
   }
 
   /* Bottom info */
   .bar{
-    background: var(--glass);
-    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.55);
+    border: 1px solid rgba(255,255,255,.75);
     border-radius: 18px;
     padding: 10px 12px;
-    backdrop-filter: blur(12px);
-    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 50px rgba(120, 20, 60, .10);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 12px;
   }
-  .nowBox{ display:flex; flex-direction:column; gap:2px; }
   .nowTitle{
-    width: fit-content;
     font-weight: 950;
     font-size: 14px;
     padding: 6px 12px;
     border-radius: 999px;
-    background: rgba(255,255,255,.18);
-    border: 1px solid rgba(255,255,255,.18);
-    box-shadow: 0 14px 36px rgba(0,0,0,.14);
+    background: rgba(255,255,255,.70);
+    border: 1px solid rgba(255,255,255,.85);
+    width: fit-content;
   }
   .nowSub{ font-size: 12px; color: var(--muted); }
 
-  /* Overlay */
+  /* Overlay memory viewer */
   .overlay{
     position:fixed; inset:0;
     display:none;
     align-items:center; justify-content:center;
-    background: rgba(0,0,0,.45);
+    background: rgba(255, 160, 200, .18);
     backdrop-filter: blur(10px);
-    z-index:80;
+    z-index: 80;
     padding: 18px;
   }
   .card{
-    width: min(900px, 96vw);
+    width: min(880px, 96vw);
     border-radius: 26px;
-    background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,255,.22);
-    box-shadow: var(--shadow);
+    background: rgba(255,255,255,.70);
+    border: 1px solid rgba(255,255,255,.85);
+    box-shadow: 0 22px 90px rgba(120, 20, 60, .18);
     overflow:hidden;
     transform: scale(.98);
     animation: pop .16s ease forwards;
@@ -312,17 +308,17 @@ html = r"""
   .cardTop{
     display:flex; justify-content:space-between; align-items:center; gap:12px;
     padding: 12px 14px;
-    background: rgba(255,255,255,.10);
-    border-bottom: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.55);
+    border-bottom: 1px solid rgba(255,255,255,.75);
   }
   .x{
     cursor:pointer;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.22);
-    background: rgba(255,255,255,.12);
-    color: var(--text);
+    border: 1px solid rgba(255,255,255,.85);
+    background: rgba(255,255,255,.70);
+    color: rgba(90, 20, 40, .92);
     padding: 8px 12px;
-    font-weight: 900;
+    font-weight: 950;
   }
 
   .cardBody{
@@ -332,87 +328,127 @@ html = r"""
     padding: 14px;
   }
 
-  /* 3D photo wrapper */
+  /* Medium photo + 3D tilt */
   .photo3d{
     position:relative;
     border-radius: 22px;
     transform-style: preserve-3d;
     perspective: 900px;
   }
+  .midImg{
+    width: 100%;
+    height: clamp(270px, 42vh, 410px);
+    object-fit: cover;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.75);
+    background: rgba(255,255,255,.55);
+    transform: translateZ(16px);
+    box-shadow: 0 18px 55px rgba(120,20,60,.16);
+    display:block;
+  }
   .shine{
     position:absolute;
     inset:0;
     border-radius: 22px;
-    background: radial-gradient(600px 220px at var(--mx,50%) var(--my,30%), rgba(255,255,255,.28), transparent 60%);
-    mix-blend-mode: screen;
+    background: radial-gradient(600px 220px at var(--mx,50%) var(--my,30%), rgba(255,0,90,.18), transparent 60%);
+    mix-blend-mode: multiply;
     pointer-events:none;
-    opacity:.65;
+    opacity:.75;
   }
 
-  /* Medium image (clear not too big) */
-  .midImg{
-    width: 100%;
-    height: clamp(280px, 45vh, 420px);
-    object-fit: cover;
-    border-radius: 22px;
-    border: 1px solid rgba(255,255,255,.18);
-    background: rgba(255,255,255,.08);
-    transform: translateZ(18px);
-    box-shadow: 0 18px 55px rgba(0,0,0,.25);
-    display:block;
-  }
-
-  .info{
-    display:flex; flex-direction:column; gap: 10px;
-  }
+  .info{ display:flex; flex-direction:column; gap:10px; }
   .date{
     width:fit-content;
     padding: 7px 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,.16);
-    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.85);
     font-size: 12px;
-    color: rgba(255,255,255,.92);
+    color: rgba(90,20,40,.82);
   }
-  .head{ font-size: 24px; font-weight: 950; line-height: 1.08; }
-  .desc{ font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.90); }
+  .head{ font-size: 24px; font-weight: 950; line-height: 1.08; color: rgba(90,10,35,.95); }
+  .desc{ font-size: 14px; line-height: 1.6; color: rgba(90,20,40,.84); }
 
   @media (max-width: 860px){
     .cardBody{ grid-template-columns: 1fr; }
-    .midImg{ height: clamp(260px, 38vh, 360px); }
+    .midImg{ height: clamp(250px, 36vh, 350px); }
   }
 </style>
 </head>
 
 <body>
-  <div class="glow"></div>
+<script>
+  // Hearts + glitter all over background
+  const heartCount = 46;
+  for(let i=0;i<heartCount;i++){
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.style.left = (Math.random()*100) + "vw";
+    h.style.animationDuration = (6 + Math.random()*8) + "s";
+    h.style.fontSize = (14 + Math.random()*20) + "px";
+    h.style.setProperty("--dx", ((Math.random()*180)-90) + "px");
+    h.style.animationDelay = (Math.random()*6) + "s";
+    document.body.appendChild(h);
+  }
+  const sparkCount = 34;
+  for(let i=0;i<sparkCount;i++){
+    const s = document.createElement("div");
+    s.className = "spark";
+    s.style.left = (Math.random()*100) + "vw";
+    s.style.top  = (Math.random()*100) + "vh";
+    s.style.animationDuration = (2.0 + Math.random()*3.0) + "s";
+    s.style.animationDelay = (Math.random()*2.5) + "s";
+    document.body.appendChild(s);
+  }
+</script>
 
   <div class="hud">
     <div class="pill">
-      <div class="title">💖 Love Flight — click a stop</div>
+      <div class="title">💖 Click any stop — plane will fly then memory opens</div>
       <div class="tiny" id="counter">0 opened</div>
     </div>
     <div class="pill">
-      <button class="btn" id="prev">⬅️ Prev</button>
-      <button class="btn" id="next">Next ➡️</button>
-      <button class="btn" id="reset">Reset</button>
+      <div class="tiny" id="tip">Tip: click a stop (any order)</div>
     </div>
   </div>
 
   <div class="wrap">
     <div class="map" id="map">
-      <div class="route"></div>
-      <div class="trail" id="trail"></div>
+      <!-- River path -->
+      <svg class="riverSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <!-- river under-glow -->
+        <path d="M50,5
+                 C30,12 72,18 50,25
+                 C28,32 74,40 52,48
+                 C30,56 70,63 50,72
+                 C30,80 72,88 50,95"
+              fill="none" stroke="rgba(255,255,255,.55)" stroke-width="10" stroke-linecap="round"/>
+        <!-- river main -->
+        <path d="M50,5
+                 C30,12 72,18 50,25
+                 C28,32 74,40 52,48
+                 C30,56 70,63 50,72
+                 C30,80 72,88 50,95"
+              fill="none" stroke="rgba(255, 120, 170, .55)" stroke-width="7" stroke-linecap="round"/>
+        <!-- river sparkle line -->
+        <path d="M50,5
+                 C30,12 72,18 50,25
+                 C28,32 74,40 52,48
+                 C30,56 70,63 50,72
+                 C30,80 72,88 50,95"
+              fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.2" stroke-dasharray="3 4" stroke-linecap="round"/>
+      </svg>
+
       <div class="plane" id="plane">✈️</div>
-      <div class="stops" id="stops"></div>
+      <div id="stopsLayer"></div>
     </div>
 
     <div class="bar">
-      <div class="nowBox">
+      <div>
         <div class="nowTitle" id="nowTitle">Current: —</div>
-        <div class="nowSub" id="nowSub">Click a stop</div>
+        <div class="nowSub" id="nowSub">Click a stop to fly</div>
       </div>
-      <span class="tiny">Active stop highlighted • 3D photo animation</span>
+      <div class="tiny">No Prev/Next • Auto fly + delay open</div>
     </div>
   </div>
 
@@ -421,7 +457,7 @@ html = r"""
       <div class="cardTop">
         <div style="display:flex; gap:10px; align-items:center;">
           <div class="date" id="cDate"></div>
-          <div style="font-weight:900; color:rgba(255,255,255,.92);" id="cSmall"></div>
+          <div style="font-weight:950; color:rgba(90,10,35,.90);" id="cSmall"></div>
         </div>
         <button class="x" id="close">✕</button>
       </div>
@@ -435,39 +471,25 @@ html = r"""
         <div class="info">
           <div class="head" id="cHead"></div>
           <div class="desc" id="cDesc"></div>
-          <div class="tiny" style="margin-top:auto;">
-            Tip: Click outside to close • Use Next/Prev to fly
-          </div>
+          <div class="tiny" style="margin-top:auto;">Click outside to close</div>
         </div>
       </div>
     </div>
   </div>
 
 <script>
-  // ---- Animated hearts background ----
-  const heartIcons = ["❤","💗","💖","💕","💞"];
-  for(let i=0;i<34;i++){
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.style.left = (Math.random()*100) + "vw";
-    h.style.animationDuration = (6 + Math.random()*8) + "s";
-    h.style.fontSize = (14 + Math.random()*18) + "px";
-    h.style.setProperty("--dx", ((Math.random()*140)-70) + "px");
-    h.innerHTML = heartIcons[Math.floor(Math.random()*heartIcons.length)];
-    document.body.appendChild(h);
-  }
-
   const STAGES = __PAYLOAD__;
 
-  const KEY = "mz_love_flight_v4";
+  // Store opened
+  const KEY = "mz_love_river_v1";
   let opened = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
 
-  const stopsEl = document.getElementById("stops");
-  const plane = document.getElementById("plane");
-  const trail = document.getElementById("trail");
   const counter = document.getElementById("counter");
   const nowTitle = document.getElementById("nowTitle");
   const nowSub = document.getElementById("nowSub");
+
+  const stopsLayer = document.getElementById("stopsLayer");
+  const plane = document.getElementById("plane");
 
   const overlay = document.getElementById("overlay");
   const closeBtn = document.getElementById("close");
@@ -480,8 +502,27 @@ html = r"""
   const photo3d = document.getElementById("photo3d");
   const shine = document.getElementById("shine");
 
+  // ---- Stop positions along a vertical wavy river (x%, y%) ----
+  // You can tweak these for more/less wave.
+  const POS = [
+    {x:50, y:8},
+    {x:40, y:15},
+    {x:58, y:22},
+    {x:44, y:30},
+    {x:62, y:38},
+    {x:48, y:46},
+    {x:64, y:54},
+    {x:46, y:62},
+    {x:60, y:70},
+    {x:45, y:78},
+    {x:62, y:86},
+    {x:50, y:93},
+    {x:55, y:97},
+  ].slice(0, STAGES.length);
+
   let idx = 0;
   let anim = null;
+  let isFlying = false;
 
   function save(){
     localStorage.setItem(KEY, JSON.stringify(Array.from(opened)));
@@ -492,61 +533,74 @@ html = r"""
     counter.textContent = `${opened.size} / ${STAGES.length} opened`;
   }
 
-  function pctFor(i){
-    if(STAGES.length <= 1) return 6;
-    return (6 + (88 * (i/(STAGES.length-1))));
-  }
-
   function setActiveStop(i){
-    [...stopsEl.children].forEach((b, j)=>{
+    [...stopsLayer.querySelectorAll(".stop")].forEach((b, j)=>{
       b.classList.toggle("active", j === i);
     });
   }
 
-  function flyTo(i){
-    i = Math.max(0, Math.min(STAGES.length-1, i));
-    const from = parseFloat(plane.dataset.pct || pctFor(idx));
-    const to = pctFor(i);
+  // ---- Smooth fly from current position to target position ----
+  function flyTo(targetIdx, openAfter=false){
+    targetIdx = Math.max(0, Math.min(STAGES.length-1, targetIdx));
+    const from = POS[idx];
+    const to = POS[targetIdx];
 
     if(anim) cancelAnimationFrame(anim);
+    isFlying = true;
 
-    const start = performance.now();
-    const dur = 650;
-    const ease = (t) => 1 - Math.pow(1 - t, 3);
-
-    idx = i;
+    // update current event text immediately (highlight)
+    idx = targetIdx;
     setActiveStop(idx);
-
     const s = STAGES[idx];
     nowTitle.textContent = `Current: Stop ${idx+1} — ${s.title}`;
-    nowSub.textContent = `${s.date}`;
-    trail.style.width = (to - 6) + "%";
+    nowSub.textContent = s.date;
+
+    // flight duration depends on distance
+    const dx = (to.x - from.x);
+    const dy = (to.y - from.y);
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dur = Math.min(1200, Math.max(600, dist * 26)); // ms
+
+    const start = performance.now();
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    // a small arc effect so it feels like flying
+    const arc = Math.max(1.5, Math.min(6, dist/5)); // percent arc
 
     function step(now){
       const t = Math.min(1, (now - start) / dur);
-      const cur = from + (to - from) * ease(t);
+      const e = ease(t);
 
-      plane.style.left = cur + "%";
-      plane.dataset.pct = cur;
+      const x = from.x + (to.x - from.x) * e;
+      // arc: a little curve up-down while flying
+      const y = from.y + (to.y - from.y) * e - Math.sin(Math.PI * e) * arc;
+
+      plane.style.left = x + "%";
+      plane.style.top  = y + "%";
 
       if(t < 1){
         anim = requestAnimationFrame(step);
       }else{
-        plane.dataset.pct = to;
-        plane.style.left = to + "%";
+        plane.style.left = to.x + "%";
+        plane.style.top  = to.y + "%";
+        isFlying = false;
+
+        if(openAfter){
+          // delay so user sees plane reached the stop
+          setTimeout(()=> openStageNow(), 260);
+        }
       }
     }
     anim = requestAnimationFrame(step);
   }
 
-  function openStage(i){
-    flyTo(i);
-
+  function openStageNow(){
     const s = STAGES[idx];
+
     opened.add(s.id);
     save();
 
-    const btn = stopsEl.children[idx];
+    const btn = stopsLayer.querySelectorAll(".stop")[idx];
     if(btn) btn.classList.add("opened");
 
     cImg.src = s.img || "";
@@ -563,33 +617,33 @@ html = r"""
   closeBtn.addEventListener("click", closeStage);
   overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeStage(); });
 
-  document.getElementById("next").addEventListener("click", ()=> flyTo(idx+1));
-  document.getElementById("prev").addEventListener("click", ()=> flyTo(idx-1));
-  document.getElementById("reset").addEventListener("click", ()=>{
-    localStorage.removeItem(KEY);
-    opened = new Set();
-    buildStops();
-    flyTo(0);
-    closeStage();
-  });
-
+  // Build stops vertically on river positions
   function buildStops(){
-    stopsEl.innerHTML = "";
+    stopsLayer.innerHTML = "";
     STAGES.forEach((s, i)=>{
+      const p = POS[i];
       const b = document.createElement("div");
       b.className = "stop" + (opened.has(s.id) ? " opened" : "");
+      b.style.left = p.x + "%";
+      b.style.top  = p.y + "%";
       b.innerHTML = `
         <div class="hint">${s.date} • ${s.title}</div>
         <div class="n">${i+1}</div>
       `;
-      b.addEventListener("click", ()=> openStage(i));
-      stopsEl.appendChild(b);
+      b.addEventListener("click", ()=>{
+        // close if open
+        closeStage();
+
+        // fly from current to clicked, THEN open with delay
+        flyTo(i, true);
+      });
+      stopsLayer.appendChild(b);
     });
     updateCounter();
     setActiveStop(0);
   }
 
-  // 3D tilt effect for photo
+  // 3D tilt photo
   function resetTilt(){
     photo3d.style.transform = "rotateX(0deg) rotateY(0deg)";
     shine.style.setProperty("--mx", "50%");
@@ -597,21 +651,23 @@ html = r"""
   }
   photo3d.addEventListener("mousemove", (e)=>{
     const r = photo3d.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width;  // 0..1
-    const y = (e.clientY - r.top) / r.height;  // 0..1
-    const rotY = (x - 0.5) * 14;   // left/right
-    const rotX = (0.5 - y) * 10;   // up/down
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    const rotY = (x - 0.5) * 14;
+    const rotX = (0.5 - y) * 10;
     photo3d.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
     shine.style.setProperty("--mx", (x*100).toFixed(1) + "%");
     shine.style.setProperty("--my", (y*100).toFixed(1) + "%");
   });
   photo3d.addEventListener("mouseleave", resetTilt);
 
+  // Init
   buildStops();
-  plane.dataset.pct = pctFor(0);
-  plane.style.left = pctFor(0) + "%";
-  trail.style.width = "0%";
-  flyTo(0);
+  // start plane at first stop
+  plane.style.left = POS[0].x + "%";
+  plane.style.top  = POS[0].y + "%";
+  nowTitle.textContent = `Current: Stop 1 — ${STAGES[0].title}`;
+  nowSub.textContent = STAGES[0].date;
   resetTilt();
 </script>
 </body>
@@ -619,6 +675,6 @@ html = r"""
 """
 
 html = html.replace("__PAYLOAD__", payload_json)
-st.components.v1.html(html, height=820, scrolling=False)
+st.components.v1.html(html, height=840, scrolling=False)
 
-st.caption("✅ 26 Dec removed. ✅ Pink hearts animated background. ✅ Plane flies. ✅ Medium 3D photo opens. ✅ Active event highlighted.")
+st.caption("✅ No Prev/Next. ✅ Click any stop → plane flies (auto) → small delay → memory opens. ✅ Light pink background + glitter hearts everywhere. ✅ River-like vertical path.")

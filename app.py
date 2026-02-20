@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import streamlit as st
 
-st.set_page_config(page_title="Meera ❤ Zeel — Valentine Journey", layout="wide")
+st.set_page_config(page_title="Meera ❤ Zeel — Journey Game", layout="wide")
 
 ASSETS = Path(__file__).parent / "assets"
 
@@ -11,16 +11,11 @@ def to_data_uri(path: Path) -> str:
     if not path.exists():
         return ""
     ext = path.suffix.lower().replace(".", "")
-    if ext == "png":
-        mime = "png"
-    elif ext in ("jpg", "jpeg"):
-        mime = "jpeg"
-    else:
-        mime = "png"
+    mime = "png" if ext == "png" else "jpeg"
     return f"data:image/{mime};base64," + base64.b64encode(path.read_bytes()).decode("utf-8")
 
 # -----------------------
-# STAGES (EDIT ONLY THIS IF NEEDED)
+# STAGES
 # -----------------------
 stages = [
     {"id":"req","date":"(No date)","title":"Instagram Request 💌",
@@ -84,14 +79,10 @@ payload = []
 for s in stages:
     payload.append({**s, "img": to_data_uri(ASSETS / s["ai"])})
 
-payload_json = json.dumps(payload)  # SAFE injection (no f-string conflicts)
-total_count = len(payload)
+payload_json = json.dumps(payload)
 
-st.markdown("## 💖 Meera ❤ Zeel — Valentine Journey (Decorative Pink Theme)")
+st.markdown("## ✈️ Meera ❤ Zeel — Journey Game (Click Stops to Unlock Memories)")
 
-# -----------------------
-# FULL FRONTEND (HTML/CSS/JS) - NOT an f-string
-# -----------------------
 html = """
 <!doctype html>
 <html>
@@ -99,595 +90,482 @@ html = """
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
-  :root {
-    --glass: rgba(255,255,255,.18);
-    --stroke: rgba(255,255,255,.25);
-    --text: rgba(255,255,255,.95);
+  :root{
+    --text: rgba(255,255,255,.96);
     --muted: rgba(255,255,255,.78);
-    --shadow: 0 18px 60px rgba(0,0,0,.35);
-    --radius: 22px;
+    --glass: rgba(255,255,255,.14);
+    --stroke: rgba(255,255,255,.22);
+    --shadow: 0 22px 90px rgba(0,0,0,.45);
+    --r: 22px;
   }
-  *{ box-sizing:border-box; }
-  body {
+  *{box-sizing:border-box}
+  body{
     margin:0;
     overflow:hidden;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color: var(--text);
-    background: linear-gradient(135deg, #ffb3d9, #ff5fa2, #ff2d87);
+    background: radial-gradient(1200px 700px at 20% 10%, rgba(255,255,255,.14), transparent 60%),
+                radial-gradient(1200px 700px at 85% 30%, rgba(255,255,255,.10), transparent 62%),
+                linear-gradient(135deg, #6a5cff, #ff4fb2, #ff7a59);
   }
 
-  .glow {
-    position: fixed; inset: -120px;
-    background:
-      radial-gradient(900px 500px at 15% 15%, rgba(255,255,255,.20), transparent 60%),
-      radial-gradient(900px 500px at 85% 25%, rgba(255,255,255,.14), transparent 60%),
-      radial-gradient(1200px 700px at 50% 90%, rgba(0,0,0,.20), transparent 65%);
-    z-index:-2;
-    pointer-events:none;
-    filter: blur(10px);
-  }
-
-  .heart {
-    position: fixed;
-    bottom: -20px;
-    font-size: 18px;
-    opacity: .0;
-    animation: floatUp linear infinite;
-    z-index: -1;
-    filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
-  }
-  @keyframes floatUp {
-    0%   { transform: translateY(0) scale(.6) rotate(0deg); opacity: 0; }
-    10%  { opacity: .85; }
-    100% { transform: translateY(-120vh) scale(1.25) rotate(20deg); opacity: 0; }
-  }
-
-  .spark {
-    position: fixed;
-    width: 6px; height: 6px;
+  /* cute sky overlays */
+  .cloud{
+    position:fixed;
+    top: 8vh;
+    width: 220px;
+    height: 70px;
+    background: rgba(255,255,255,.28);
+    border: 1px solid rgba(255,255,255,.18);
     border-radius: 999px;
-    background: rgba(255,255,255,.9);
-    opacity: .0;
-    animation: twinkle ease-in-out infinite;
-    z-index:-1;
+    filter: blur(.2px);
+    box-shadow: 0 18px 45px rgba(0,0,0,.18);
+    opacity: .75;
+    z-index:-2;
+    animation: drift linear infinite;
   }
-  @keyframes twinkle {
-    0%,100% { transform: scale(.6); opacity: .0; }
-    40%     { opacity: .85; }
-    60%     { transform: scale(1.25); opacity: .95; }
+  .cloud:before,.cloud:after{
+    content:"";
+    position:absolute;
+    background: rgba(255,255,255,.28);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+  }
+  .cloud:before{ width: 90px; height: 90px; left: 22px; top: -35px; }
+  .cloud:after{ width: 120px; height: 120px; left: 95px; top: -55px; }
+  @keyframes drift{
+    from{ transform: translateX(-30vw); }
+    to{ transform: translateX(130vw); }
   }
 
-  .hud {
-    position: fixed; left: 14px; right: 14px; top: 10px;
-    z-index: 20;
-    display:flex; justify-content:space-between; gap: 10px; align-items:center;
+  .stars{
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(2px 2px at 15% 20%, rgba(255,255,255,.9), transparent 60%),
+      radial-gradient(2px 2px at 70% 18%, rgba(255,255,255,.8), transparent 60%),
+      radial-gradient(1.6px 1.6px at 35% 35%, rgba(255,255,255,.7), transparent 60%),
+      radial-gradient(1.8px 1.8px at 90% 40%, rgba(255,255,255,.75), transparent 60%),
+      radial-gradient(1.6px 1.6px at 55% 12%, rgba(255,255,255,.75), transparent 60%),
+      radial-gradient(1.4px 1.4px at 22% 52%, rgba(255,255,255,.6), transparent 60%);
+    opacity:.55;
+    z-index:-3;
+    pointer-events:none;
   }
-  .pill {
-    backdrop-filter: blur(12px);
-    background: rgba(255,255,255,.18);
-    border: 1px solid rgba(255,255,255,.26);
+
+  /* HUD */
+  .hud{
+    position:fixed;
+    left: 14px; right:14px; top: 12px;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    z-index:30;
+  }
+  .pill{
+    background: var(--glass);
+    border: 1px solid var(--stroke);
     border-radius: 999px;
     padding: 10px 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.22);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.22);
     display:flex; gap:10px; align-items:center;
-    min-height: 42px;
+    min-height: 44px;
     white-space: nowrap;
   }
-  .title { font-weight: 900; letter-spacing: .2px; }
-  .tiny  { font-size: 12px; color: var(--muted); }
-
-  .btn {
-    cursor:pointer; user-select:none;
-    border: 1px solid rgba(255,255,255,.28);
-    background: rgba(255,255,255,.14);
+  .title{ font-weight: 900; letter-spacing:.2px; }
+  .tiny{ font-size: 12px; color: var(--muted); }
+  .btn{
+    cursor:pointer;
+    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.12);
     color: var(--text);
     padding: 9px 12px;
     border-radius: 999px;
-    font-weight: 800;
+    font-weight: 900;
     transition: transform .12s ease, background .12s ease;
   }
-  .btn:hover { background: rgba(255,255,255,.22); }
-  .btn:active { transform: scale(.98); }
+  .btn:hover{ background: rgba(255,255,255,.18); }
+  .btn:active{ transform: scale(.98); }
 
-  .wrap {
-    position: fixed; inset: 0;
-    padding-top: 72px;
-    padding-bottom: 14px;
-    display:flex; flex-direction:column;
-  }
-
-  .track {
-    margin: 0 14px;
-    height: 10px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.22);
-    border: 1px solid rgba(255,255,255,.28);
-    position: relative;
-    overflow: hidden;
-  }
-  .progress {
-    height: 100%;
-    width: 0%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255,255,255,.75), rgba(255,255,255,.40));
-    transition: width .55s ease;
-  }
-  .plane {
-    position:absolute;
-    top: 50%;
-    left: 0%;
-    transform: translate(-10px,-50%);
-    transition: left .55s ease;
-    font-size: 18px;
-    filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
-  }
-
-  .journey {
-    flex: 1;
-    margin-top: 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    display:flex;
-    gap: 16px;
-    padding: 10px 14px 18px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .journey::-webkit-scrollbar { height: 10px; }
-  .journey::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,.35);
-    border-radius: 999px;
-  }
-
-  .stage {
-    scroll-snap-align: start;
-    min-width: min(86vw, 420px);
-    max-width: 420px;
-    height: 100%;
-    border-radius: var(--radius);
-    backdrop-filter: blur(14px);
-    background: rgba(255,255,255,.16);
-    border: 1px solid rgba(255,255,255,.28);
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-    padding: 16px;
-    display:flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .row {
-    display:flex;
-    align-items:flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .badge {
-    font-size: 12px;
-    background: rgba(255,255,255,.18);
-    border: 1px solid rgba(255,255,255,.25);
-    border-radius: 999px;
-    padding: 6px 10px;
-    color: rgba(255,255,255,.92);
-    width: fit-content;
-  }
-
-  .stage h2 {
-    margin: 6px 0 0;
-    font-size: 20px;
-    line-height: 1.15;
-    letter-spacing: .2px;
-  }
-  .stage p {
-    margin: 0;
-    color: rgba(255,255,255,.82);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .giftArea {
-    margin-top: 6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position: relative;
-    min-height: 230px;
-  }
-
-  .giftBtn {
-    position: relative;
-    width: 168px;
-    height: 168px;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    filter: drop-shadow(0 18px 28px rgba(0,0,0,.35));
-  }
-
-  .gift {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-origin: center;
-  }
-
-  .boxBase {
-    position:absolute;
-    left: 20px; right: 20px;
-    bottom: 18px;
-    height: 92px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.22);
-    border: 1px solid rgba(255,255,255,.30);
-  }
-  .boxLid {
-    position:absolute;
-    left: 14px; right: 14px;
-    bottom: 88px;
-    height: 54px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.26);
-    border: 1px solid rgba(255,255,255,.30);
-    transform-origin: left bottom;
-    transition: transform .6s cubic-bezier(.2,.9,.2,1);
-  }
-  .ribbonV {
-    position:absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 18px;
-    width: 20px;
-    height: 124px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.85);
-    opacity: .92;
-  }
-  .ribbonH {
-    position:absolute;
-    left: 20px; right: 20px;
-    bottom: 58px;
-    height: 20px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.85);
-    opacity: .92;
-  }
-  .bow {
-    position:absolute;
-    left: 50%;
-    bottom: 124px;
-    transform: translateX(-50%);
-    width: 58px;
-    height: 32px;
-    display:flex; gap: 6px;
-    align-items:center;
-    justify-content:center;
-  }
-  .bow span {
-    width: 26px; height: 22px;
-    border-radius: 999px 999px 999px 6px;
-    background: rgba(255,255,255,.90);
-    transform: rotate(12deg);
-    border: 1px solid rgba(255,255,255,.22);
-  }
-  .bow span:last-child {
-    border-radius: 999px 999px 6px 999px;
-    transform: rotate(-12deg);
-  }
-
-  .opened .boxLid { transform: rotate(-52deg) translate(-6px,-8px); }
-
-  .burstLayer {
-    position:absolute; inset:0;
-    pointer-events:none;
-    overflow:hidden;
-  }
-  .balloon {
-    position:absolute;
-    bottom: -40px;
-    width: 24px; height: 30px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.95);
-    filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
-    animation: floatB 1.5s ease forwards;
-    opacity:.95;
-  }
-  .balloon::after {
-    content:"";
-    position:absolute;
-    left: 50%;
-    bottom: -18px;
-    width: 1px;
-    height: 22px;
-    background: rgba(255,255,255,.75);
-    transform: translateX(-50%);
-    opacity:.75;
-  }
-  @keyframes floatB {
-    from{ transform: translateY(0) translateX(0); opacity: .95; }
-    to{ transform: translateY(-260px) translateX(var(--dx)); opacity: 0; }
-  }
-
-  .conf {
-    position:absolute;
-    width: 8px; height: 12px;
-    background: rgba(255,255,255,.95);
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    animation: confetti 1.1s ease forwards;
-    opacity:.95;
-  }
-  @keyframes confetti {
-    from{ transform: translate(-50%,-50%) rotate(0deg); }
-    to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(540deg); opacity: 0; }
-  }
-
-  .modalBack {
+  /* Map area */
+  .wrap{
     position:fixed; inset:0;
-    display:none;
-    z-index: 60;
-    background: rgba(0,0,0,.48);
-    backdrop-filter: blur(7px);
-    align-items:center;
-    justify-content:center;
-    padding: 18px;
-  }
-  .modal {
-    width: min(560px, 96vw);
-    border-radius: 22px;
-    border: 1px solid rgba(255,255,255,.25);
-    background: rgba(255,255,255,.14);
-    box-shadow: 0 30px 90px rgba(0,0,0,.55);
-    overflow:hidden;
-  }
-  .modalTop {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding: 12px 14px;
-    background: rgba(255,255,255,.14);
-    border-bottom: 1px solid rgba(255,255,255,.18);
-  }
-  .closeBtn {
-    border:1px solid rgba(255,255,255,.25);
-    background: rgba(255,255,255,.16);
-    color: rgba(255,255,255,.95);
-    padding: 8px 10px;
-    border-radius: 999px;
-    cursor:pointer;
-    font-weight: 900;
-  }
-  .modalBody {
-    padding: 14px;
-    display:flex;
-    gap: 12px;
-    align-items:flex-start;
-  }
-  .modalImg {
-    width: 150px;
-    height: 150px;
-    border-radius: 20px;
-    object-fit: cover;
-    border: 1px solid rgba(255,255,255,.22);
-    background: rgba(255,255,255,.10);
-  }
-  .modalText {
+    padding: 74px 14px 14px;
     display:flex;
     flex-direction:column;
-    gap: 6px;
-    min-width: 0;
+    gap: 12px;
   }
-  .modalText .d { font-size: 12px; color: rgba(255,255,255,.80); }
-  .modalText .t { font-size: 18px; font-weight: 900; line-height: 1.1; }
-  .modalText .p { font-size: 13px; color: rgba(255,255,255,.90); line-height: 1.45; }
+
+  .map{
+    flex: 1;
+    position:relative;
+    border-radius: 26px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.16);
+    backdrop-filter: blur(10px);
+    overflow:hidden;
+    box-shadow: 0 26px 90px rgba(0,0,0,.35);
+  }
+
+  /* dotted route line */
+  .route{
+    position:absolute;
+    left: 6%;
+    right: 6%;
+    top: 52%;
+    height: 0;
+    border-top: 3px dashed rgba(255,255,255,.45);
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,.28));
+  }
+
+  /* stops row */
+  .stops{
+    position:absolute;
+    left: 6%;
+    right: 6%;
+    top: calc(52% - 32px);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 10px;
+    pointer-events:auto;
+  }
+
+  .stop{
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.30);
+    backdrop-filter: blur(10px);
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    position:relative;
+    box-shadow: 0 12px 35px rgba(0,0,0,.25);
+    transition: transform .15s ease, background .15s ease;
+    flex: 0 0 auto;
+  }
+  .stop:hover{ transform: translateY(-2px) scale(1.03); background: rgba(255,255,255,.22); }
+  .stop .n{
+    font-weight: 900;
+    font-size: 12px;
+    color: rgba(255,255,255,.95);
+    user-select:none;
+  }
+  .stop.opened{
+    background: rgba(255,255,255,.28);
+    border-color: rgba(255,255,255,.40);
+  }
+  .stop .hint{
+    position:absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.22);
+    color: rgba(255,255,255,.92);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events:none;
+    transition: opacity .15s ease;
+    backdrop-filter: blur(8px);
+  }
+  .stop:hover .hint{ opacity: 1; }
+
+  /* plane */
+  .plane{
+    position:absolute;
+    top: calc(52% - 72px);
+    left: 6%;
+    font-size: 34px;
+    transform: translateX(-50%);
+    transition: left .55s cubic-bezier(.2,.9,.2,1);
+    filter: drop-shadow(0 18px 26px rgba(0,0,0,.35));
+    z-index: 10;
+  }
+
+  /* bottom panel - stage list small */
+  .bar{
+    background: var(--glass);
+    border: 1px solid var(--stroke);
+    border-radius: 18px;
+    padding: 10px 12px;
+    backdrop-filter: blur(12px);
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .bar b{ font-size: 13px; }
+  .bar span{ font-size: 12px; color: var(--muted); }
+
+  /* Big open card (overlay) */
+  .overlay{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 80;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(9px);
+    padding: 18px;
+  }
+  .card{
+    width: min(980px, 96vw);
+    border-radius: 26px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.22);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    transform: scale(.98);
+    animation: pop .16s ease forwards;
+  }
+  @keyframes pop{ to{ transform: scale(1); } }
+
+  .cardTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,.10);
+    border-bottom: 1px solid rgba(255,255,255,.16);
+  }
+  .x{
+    cursor:pointer;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(255,255,255,.12);
+    color: var(--text);
+    padding: 8px 12px;
+    font-weight: 900;
+  }
+
+  .cardBody{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  /* BIG IMAGE */
+  .bigImg{
+    width: 100%;
+    height: min(62vh, 520px);
+    object-fit: cover;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.08);
+  }
+
+  .info{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    min-width:0;
+  }
+  .date{
+    width:fit-content;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.18);
+    font-size: 12px;
+    color: rgba(255,255,255,.90);
+  }
+  .head{
+    font-size: 26px;
+    font-weight: 950;
+    line-height: 1.05;
+  }
+  .desc{
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255,255,255,.88);
+  }
+
+  @media (max-width: 860px){
+    .cardBody{ grid-template-columns: 1fr; }
+    .bigImg{ height: min(52vh, 420px); }
+  }
 </style>
 </head>
 
 <body>
-  <div class="glow"></div>
+  <div class="stars"></div>
+  <div class="cloud" style="left:-30vw; top:9vh; animation-duration: 24s;"></div>
+  <div class="cloud" style="left:-45vw; top:22vh; animation-duration: 30s; opacity:.6;"></div>
+  <div class="cloud" style="left:-60vw; top:38vh; animation-duration: 34s; opacity:.5;"></div>
 
   <div class="hud">
     <div class="pill">
-      <div class="title">💝 Open gifts to unlock memories</div>
-      <div class="tiny" id="counter">0 / __TOTAL__ opened</div>
+      <div class="title">✈️ Tap a stop to open memory</div>
+      <div class="tiny" id="counter">0 opened</div>
     </div>
     <div class="pill">
-      <button class="btn" id="left">⬅️</button>
-      <button class="btn" id="right">➡️</button>
+      <button class="btn" id="prev">⬅️ Prev</button>
+      <button class="btn" id="next">Next ➡️</button>
       <button class="btn" id="reset">Reset</button>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="track">
-      <div class="progress" id="progress"></div>
-      <div class="plane" id="plane">🛫</div>
+    <div class="map" id="map">
+      <div class="route"></div>
+      <div class="plane" id="plane">✈️</div>
+      <div class="stops" id="stops"></div>
     </div>
 
-    <div class="journey" id="journey"></div>
+    <div class="bar">
+      <div>
+        <b id="nowTitle">Ready ✨</b><br/>
+        <span id="nowSub">Click any stop to begin</span>
+      </div>
+      <span>Game Style Journey • Big Photo Viewer</span>
+    </div>
   </div>
 
-  <div class="modalBack" id="modalBack">
-    <div class="modal">
-      <div class="modalTop">
-        <b>Unlocked Memory 💖</b>
-        <button class="closeBtn" id="close">✕</button>
+  <div class="overlay" id="overlay">
+    <div class="card" id="card">
+      <div class="cardTop">
+        <div style="display:flex; gap:10px; align-items:center; min-width:0;">
+          <div class="date" id="cDate"></div>
+          <div style="font-weight:900; color:rgba(255,255,255,.92); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="cSmall"></div>
+        </div>
+        <button class="x" id="close">✕</button>
       </div>
-      <div class="modalBody">
-        <img class="modalImg" id="mImg" src="" alt="memory"/>
-        <div class="modalText">
-          <div class="d" id="mDate"></div>
-          <div class="t" id="mHead"></div>
-          <div class="p" id="mDesc"></div>
+
+      <div class="cardBody">
+        <img class="bigImg" id="cImg" src="" alt="memory"/>
+        <div class="info">
+          <div class="head" id="cHead"></div>
+          <div class="desc" id="cDesc"></div>
+          <div class="tiny" style="margin-top:auto;">
+            Tip: Click outside to close • Use Next/Prev to move plane
+          </div>
         </div>
       </div>
     </div>
   </div>
 
 <script>
-  // --- Floating hearts + sparkles ---
-  const heartIcons = ["❤","💗","💖","💞","💕"];
-  for(let i=0;i<26;i++){
-    const h = document.createElement("div");
-    h.className = "heart";
-    h.style.left = (Math.random()*100) + "vw";
-    h.style.animationDuration = (6 + Math.random()*7) + "s";
-    h.style.fontSize = (14 + Math.random()*16) + "px";
-    h.style.opacity = (0.25 + Math.random()*0.65).toFixed(2);
-    h.innerHTML = heartIcons[Math.floor(Math.random()*heartIcons.length)];
-    document.body.appendChild(h);
-  }
-  for(let i=0;i<28;i++){
-    const s = document.createElement("div");
-    s.className = "spark";
-    s.style.left = (Math.random()*100) + "vw";
-    s.style.top = (Math.random()*100) + "vh";
-    s.style.animationDuration = (2.2 + Math.random()*3.5) + "s";
-    s.style.animationDelay = (Math.random()*2.5) + "s";
-    document.body.appendChild(s);
-  }
-
-  // Data (injected safely)
   const STAGES = __PAYLOAD__;
 
-  // Local progress
-  const KEY = "mz_pink_valentine_opened_v1";
+  // progress saved
+  const KEY = "mz_game_opened_v2";
   let opened = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
 
-  const journey = document.getElementById("journey");
-  const counter = document.getElementById("counter");
-  const progress = document.getElementById("progress");
+  const stopsEl = document.getElementById("stops");
   const plane = document.getElementById("plane");
+  const counter = document.getElementById("counter");
+
+  const nowTitle = document.getElementById("nowTitle");
+  const nowSub = document.getElementById("nowSub");
+
+  const overlay = document.getElementById("overlay");
+  const closeBtn = document.getElementById("close");
+  const cImg = document.getElementById("cImg");
+  const cDate = document.getElementById("cDate");
+  const cSmall = document.getElementById("cSmall");
+  const cHead = document.getElementById("cHead");
+  const cDesc = document.getElementById("cDesc");
+
+  let idx = 0;
 
   function save(){
     localStorage.setItem(KEY, JSON.stringify(Array.from(opened)));
-    updateHUD();
+    updateCounter();
   }
 
-  function updateHUD(){
-    const total = STAGES.length;
-    const n = opened.size;
-    counter.textContent = `${n} / ${total} opened`;
-    const pct = total === 0 ? 0 : Math.round((n/total)*100);
-    progress.style.width = pct + "%";
+  function updateCounter(){
+    counter.textContent = `${opened.size} / ${STAGES.length} opened`;
+  }
+
+  function planeTo(i){
+    idx = Math.max(0, Math.min(STAGES.length-1, i));
+    const pct = STAGES.length === 1 ? 6 : (6 + (88 * (idx/(STAGES.length-1))));
     plane.style.left = pct + "%";
-    plane.textContent = pct >= 100 ? "🛬" : (pct >= 60 ? "✈️" : "🛫");
-  }
 
-  function rand(min,max){ return Math.random()*(max-min)+min; }
+    const s = STAGES[idx];
+    nowTitle.textContent = `Stop ${idx+1}: ${s.title}`;
+    nowSub.textContent = s.date;
 
-  function celebrate(layer){
-    layer.innerHTML = "";
-    for(let i=0;i<10;i++){
-      const b = document.createElement("div");
-      b.className = "balloon";
-      b.style.left = rand(8,92) + "%";
-      b.style.setProperty("--dx", rand(-60,60) + "px");
-      layer.appendChild(b);
-    }
-    for(let i=0;i<18;i++){
-      const c = document.createElement("div");
-      c.className = "conf";
-      c.style.left = rand(35,65) + "%";
-      c.style.top = rand(35,55) + "%";
-      c.style.setProperty("--dx", rand(-180,180) + "px");
-      c.style.setProperty("--dy", rand(-160,160) + "px");
-      layer.appendChild(c);
-    }
-    setTimeout(()=> layer.innerHTML="", 1600);
-  }
-
-  // Modal
-  const modalBack = document.getElementById("modalBack");
-  const closeBtn = document.getElementById("close");
-  const mImg = document.getElementById("mImg");
-  const mDate = document.getElementById("mDate");
-  const mHead = document.getElementById("mHead");
-  const mDesc = document.getElementById("mDesc");
-
-  function openModal(s){
-    mImg.src = s.img || "";
-    mDate.textContent = s.date;
-    mHead.textContent = s.title;
-    mDesc.textContent = s.desc;
-    modalBack.style.display = "flex";
-  }
-  function closeModal(){ modalBack.style.display="none"; }
-  closeBtn.addEventListener("click", closeModal);
-  modalBack.addEventListener("click", (e)=>{ if(e.target === modalBack) closeModal(); });
-
-  function stageCard(s, idx){
-    const card = document.createElement("div");
-    card.className = "stage";
-    card.innerHTML = `
-      <div class="row">
-        <div>
-          <div class="badge">Stage ${idx+1} / ${STAGES.length}</div>
-          <h2>${s.title}</h2>
-          <p>${s.desc}</p>
-        </div>
-        <div class="badge">${s.date}</div>
-      </div>
-
-      <div class="giftArea">
-        <button class="giftBtn" aria-label="Open gift">
-          <div class="gift ${opened.has(s.id) ? "opened" : ""}">
-            <div class="boxLid"></div>
-            <div class="boxBase"></div>
-            <div class="ribbonV"></div>
-            <div class="ribbonH"></div>
-            <div class="bow"><span></span><span></span></div>
-          </div>
-        </button>
-        <div class="burstLayer"></div>
-      </div>
-    `;
-
-    const btn = card.querySelector(".giftBtn");
-    const gift = card.querySelector(".gift");
-    const burst = card.querySelector(".burstLayer");
-
-    btn.addEventListener("click", ()=>{
-      celebrate(burst);
-
-      if(!opened.has(s.id)){
-        opened.add(s.id);
-        gift.classList.add("opened");
-        save();
-      }
-      openModal(s);
-
-      setTimeout(()=> journey.scrollBy({left: 320, behavior:"smooth"}), 500);
+    // highlight current stop
+    [...stopsEl.children].forEach((b, j)=>{
+      b.style.transform = j === idx ? "translateY(-2px) scale(1.06)" : "";
     });
-
-    return card;
   }
 
-  function build(){
-    journey.innerHTML = "";
-    STAGES.forEach((s,i)=> journey.appendChild(stageCard(s,i)));
-    updateHUD();
+  function openStage(i){
+    planeTo(i);
+    const s = STAGES[idx];
+
+    opened.add(s.id);
+    save();
+
+    // stop badge opened
+    const btn = stopsEl.children[idx];
+    if(btn) btn.classList.add("opened");
+
+    // big viewer
+    cImg.src = s.img || "";
+    cDate.textContent = s.date;
+    cSmall.textContent = `Stage ${idx+1} / ${STAGES.length}`;
+    cHead.textContent = s.title;
+    cDesc.textContent = s.desc;
+
+    overlay.style.display = "flex";
   }
 
-  document.getElementById("left").addEventListener("click", ()=> journey.scrollBy({left:-360, behavior:"smooth"}));
-  document.getElementById("right").addEventListener("click", ()=> journey.scrollBy({left:360, behavior:"smooth"}));
+  function closeStage(){
+    overlay.style.display = "none";
+  }
+
+  closeBtn.addEventListener("click", closeStage);
+  overlay.addEventListener("click", (e)=>{
+    if(e.target === overlay) closeStage();
+  });
+
+  document.getElementById("next").addEventListener("click", ()=>{
+    planeTo(idx+1);
+  });
+  document.getElementById("prev").addEventListener("click", ()=>{
+    planeTo(idx-1);
+  });
   document.getElementById("reset").addEventListener("click", ()=>{
     localStorage.removeItem(KEY);
     opened = new Set();
-    build();
+    buildStops();
+    planeTo(0);
+    closeStage();
   });
 
-  build();
+  function buildStops(){
+    stopsEl.innerHTML = "";
+    STAGES.forEach((s, i)=>{
+      const b = document.createElement("div");
+      b.className = "stop" + (opened.has(s.id) ? " opened" : "");
+      b.innerHTML = `
+        <div class="hint">${s.date} • ${s.title}</div>
+        <div class="n">${i+1}</div>
+      `;
+      b.addEventListener("click", ()=> openStage(i));
+      stopsEl.appendChild(b);
+    });
+    updateCounter();
+  }
+
+  buildStops();
+  planeTo(0);
 </script>
 </body>
 </html>
 """
 
-# Inject safely (NO f-string)
-html = html.replace("__PAYLOAD__", payload_json).replace("__TOTAL__", str(total_count))
+html = html.replace("__PAYLOAD__", payload_json)
 
-st.components.v1.html(html, height=800, scrolling=False)
-st.caption("✅ Date is NOT written on photos. Date is shown only in the UI (badge + popup).")
+st.components.v1.html(html, height=820, scrolling=False)
+st.caption("✅ Click a stop to open big photo. Click outside to close. Plane moves with Next/Prev.")

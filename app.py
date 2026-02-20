@@ -81,9 +81,9 @@ for s in stages:
 
 payload_json = json.dumps(payload)
 
-st.markdown("## ✈️ Meera ❤ Zeel — Journey Game (Click Stops to Unlock Memories)")
+st.markdown("## ✈️ Meera ❤ Zeel — Journey Game")
 
-html = """
+html = r"""
 <!doctype html>
 <html>
 <head>
@@ -97,6 +97,8 @@ html = """
     --stroke: rgba(255,255,255,.22);
     --shadow: 0 22px 90px rgba(0,0,0,.45);
     --r: 22px;
+    --accent: rgba(255,255,255,.92);
+    --active: rgba(255,255,255,.30);
   }
   *{box-sizing:border-box}
   body{
@@ -104,38 +106,10 @@ html = """
     overflow:hidden;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
     color: var(--text);
-    background: radial-gradient(1200px 700px at 20% 10%, rgba(255,255,255,.14), transparent 60%),
-                radial-gradient(1200px 700px at 85% 30%, rgba(255,255,255,.10), transparent 62%),
-                linear-gradient(135deg, #6a5cff, #ff4fb2, #ff7a59);
-  }
-
-  /* cute sky overlays */
-  .cloud{
-    position:fixed;
-    top: 8vh;
-    width: 220px;
-    height: 70px;
-    background: rgba(255,255,255,.28);
-    border: 1px solid rgba(255,255,255,.18);
-    border-radius: 999px;
-    filter: blur(.2px);
-    box-shadow: 0 18px 45px rgba(0,0,0,.18);
-    opacity: .75;
-    z-index:-2;
-    animation: drift linear infinite;
-  }
-  .cloud:before,.cloud:after{
-    content:"";
-    position:absolute;
-    background: rgba(255,255,255,.28);
-    border: 1px solid rgba(255,255,255,.18);
-    border-radius: 999px;
-  }
-  .cloud:before{ width: 90px; height: 90px; left: 22px; top: -35px; }
-  .cloud:after{ width: 120px; height: 120px; left: 95px; top: -55px; }
-  @keyframes drift{
-    from{ transform: translateX(-30vw); }
-    to{ transform: translateX(130vw); }
+    background:
+      radial-gradient(1200px 700px at 18% 12%, rgba(255,255,255,.14), transparent 60%),
+      radial-gradient(1200px 700px at 86% 28%, rgba(255,255,255,.10), transparent 62%),
+      linear-gradient(135deg, #6a5cff, #ff4fb2, #ff7a59);
   }
 
   .stars{
@@ -152,7 +126,6 @@ html = """
     pointer-events:none;
   }
 
-  /* HUD */
   .hud{
     position:fixed;
     left: 14px; right:14px; top: 12px;
@@ -185,7 +158,6 @@ html = """
   .btn:hover{ background: rgba(255,255,255,.18); }
   .btn:active{ transform: scale(.98); }
 
-  /* Map area */
   .wrap{
     position:fixed; inset:0;
     padding: 74px 14px 14px;
@@ -205,7 +177,6 @@ html = """
     box-shadow: 0 26px 90px rgba(0,0,0,.35);
   }
 
-  /* dotted route line */
   .route{
     position:absolute;
     left: 6%;
@@ -216,7 +187,6 @@ html = """
     filter: drop-shadow(0 10px 20px rgba(0,0,0,.28));
   }
 
-  /* stops row */
   .stops{
     position:absolute;
     left: 6%;
@@ -241,19 +211,26 @@ html = """
     cursor:pointer;
     position:relative;
     box-shadow: 0 12px 35px rgba(0,0,0,.25);
-    transition: transform .15s ease, background .15s ease;
+    transition: transform .15s ease, background .15s ease, outline .15s ease;
     flex: 0 0 auto;
+    outline: 0 solid rgba(255,255,255,0);
   }
   .stop:hover{ transform: translateY(-2px) scale(1.03); background: rgba(255,255,255,.22); }
+
+  .stop.active{
+    background: rgba(255,255,255,.28);
+    outline: 3px solid rgba(255,255,255,.22);
+    transform: translateY(-3px) scale(1.06);
+  }
+  .stop.opened{
+    background: rgba(255,255,255,.26);
+    border-color: rgba(255,255,255,.40);
+  }
   .stop .n{
     font-weight: 900;
     font-size: 12px;
     color: rgba(255,255,255,.95);
     user-select:none;
-  }
-  .stop.opened{
-    background: rgba(255,255,255,.28);
-    border-color: rgba(255,255,255,.40);
   }
   .stop .hint{
     position:absolute;
@@ -274,19 +251,30 @@ html = """
   }
   .stop:hover .hint{ opacity: 1; }
 
-  /* plane */
   .plane{
     position:absolute;
-    top: calc(52% - 72px);
+    top: calc(52% - 74px);
     left: 6%;
     font-size: 34px;
     transform: translateX(-50%);
-    transition: left .55s cubic-bezier(.2,.9,.2,1);
     filter: drop-shadow(0 18px 26px rgba(0,0,0,.35));
     z-index: 10;
+    will-change: left;
+  }
+  .trail{
+    position:absolute;
+    top: calc(52% - 52px);
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.55), rgba(255,255,255,.0));
+    opacity: .65;
+    filter: blur(.2px);
+    z-index: 9;
+    left: 6%;
+    width: 0%;
+    transition: width .25s ease;
   }
 
-  /* bottom panel - stage list small */
   .bar{
     background: var(--glass);
     border: 1px solid var(--stroke);
@@ -298,10 +286,26 @@ html = """
     align-items:center;
     justify-content:space-between;
   }
-  .bar b{ font-size: 13px; }
-  .bar span{ font-size: 12px; color: var(--muted); }
+  .nowBox{
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .nowTitle{
+    font-size: 14px;
+    font-weight: 950;
+    padding: 4px 10px;
+    border-radius: 999px;
+    width: fit-content;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.14);
+  }
+  .nowTitle.active{
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.22);
+    box-shadow: 0 14px 36px rgba(0,0,0,.18);
+  }
+  .nowSub{ font-size: 12px; color: var(--muted); }
 
-  /* Big open card (overlay) */
+  /* Overlay */
   .overlay{
     position:fixed;
     inset:0;
@@ -314,7 +318,7 @@ html = """
     padding: 18px;
   }
   .card{
-    width: min(980px, 96vw);
+    width: min(900px, 96vw);
     border-radius: 26px;
     background: rgba(255,255,255,.12);
     border: 1px solid rgba(255,255,255,.22);
@@ -346,15 +350,15 @@ html = """
 
   .cardBody{
     display:grid;
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: 1.15fr 1fr;
     gap: 14px;
     padding: 14px;
   }
 
-  /* BIG IMAGE */
-  .bigImg{
+  /* MEDIUM IMAGE (not too small not too big) */
+  .midImg{
     width: 100%;
-    height: min(62vh, 520px);
+    height: clamp(280px, 45vh, 420px);
     object-fit: cover;
     border-radius: 22px;
     border: 1px solid rgba(255,255,255,.18);
@@ -377,9 +381,9 @@ html = """
     color: rgba(255,255,255,.90);
   }
   .head{
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 950;
-    line-height: 1.05;
+    line-height: 1.08;
   }
   .desc{
     font-size: 14px;
@@ -389,20 +393,17 @@ html = """
 
   @media (max-width: 860px){
     .cardBody{ grid-template-columns: 1fr; }
-    .bigImg{ height: min(52vh, 420px); }
+    .midImg{ height: clamp(260px, 38vh, 360px); }
   }
 </style>
 </head>
 
 <body>
   <div class="stars"></div>
-  <div class="cloud" style="left:-30vw; top:9vh; animation-duration: 24s;"></div>
-  <div class="cloud" style="left:-45vw; top:22vh; animation-duration: 30s; opacity:.6;"></div>
-  <div class="cloud" style="left:-60vw; top:38vh; animation-duration: 34s; opacity:.5;"></div>
 
   <div class="hud">
     <div class="pill">
-      <div class="title">✈️ Tap a stop to open memory</div>
+      <div class="title">✈️ Plane flies stop → stop (click any stop)</div>
       <div class="tiny" id="counter">0 opened</div>
     </div>
     <div class="pill">
@@ -415,16 +416,17 @@ html = """
   <div class="wrap">
     <div class="map" id="map">
       <div class="route"></div>
+      <div class="trail" id="trail"></div>
       <div class="plane" id="plane">✈️</div>
       <div class="stops" id="stops"></div>
     </div>
 
     <div class="bar">
-      <div>
-        <b id="nowTitle">Ready ✨</b><br/>
-        <span id="nowSub">Click any stop to begin</span>
+      <div class="nowBox">
+        <div class="nowTitle active" id="nowTitle">Current: —</div>
+        <div class="nowSub" id="nowSub">Click a stop</div>
       </div>
-      <span>Game Style Journey • Big Photo Viewer</span>
+      <span class="tiny">Active stop is highlighted • Medium photo viewer</span>
     </div>
   </div>
 
@@ -433,13 +435,13 @@ html = """
       <div class="cardTop">
         <div style="display:flex; gap:10px; align-items:center; min-width:0;">
           <div class="date" id="cDate"></div>
-          <div style="font-weight:900; color:rgba(255,255,255,.92); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="cSmall"></div>
+          <div style="font-weight:900; color:rgba(255,255,255,.92);" id="cSmall"></div>
         </div>
         <button class="x" id="close">✕</button>
       </div>
 
       <div class="cardBody">
-        <img class="bigImg" id="cImg" src="" alt="memory"/>
+        <img class="midImg" id="cImg" src="" alt="memory"/>
         <div class="info">
           <div class="head" id="cHead"></div>
           <div class="desc" id="cDesc"></div>
@@ -454,12 +456,13 @@ html = """
 <script>
   const STAGES = __PAYLOAD__;
 
-  // progress saved
-  const KEY = "mz_game_opened_v2";
+  // saved progress
+  const KEY = "mz_game_opened_v3";
   let opened = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
 
   const stopsEl = document.getElementById("stops");
   const plane = document.getElementById("plane");
+  const trail = document.getElementById("trail");
   const counter = document.getElementById("counter");
 
   const nowTitle = document.getElementById("nowTitle");
@@ -474,6 +477,7 @@ html = """
   const cDesc = document.getElementById("cDesc");
 
   let idx = 0;
+  let anim = null;
 
   function save(){
     localStorage.setItem(KEY, JSON.stringify(Array.from(opened)));
@@ -484,33 +488,69 @@ html = """
     counter.textContent = `${opened.size} / ${STAGES.length} opened`;
   }
 
-  function planeTo(i){
-    idx = Math.max(0, Math.min(STAGES.length-1, i));
-    const pct = STAGES.length === 1 ? 6 : (6 + (88 * (idx/(STAGES.length-1))));
-    plane.style.left = pct + "%";
+  function pctFor(i){
+    if(STAGES.length <= 1) return 6;
+    return (6 + (88 * (i/(STAGES.length-1))));
+  }
 
-    const s = STAGES[idx];
-    nowTitle.textContent = `Stop ${idx+1}: ${s.title}`;
-    nowSub.textContent = s.date;
-
-    // highlight current stop
+  function setActiveStop(i){
     [...stopsEl.children].forEach((b, j)=>{
-      b.style.transform = j === idx ? "translateY(-2px) scale(1.06)" : "";
+      b.classList.toggle("active", j === i);
     });
   }
 
-  function openStage(i){
-    planeTo(i);
-    const s = STAGES[idx];
+  // Smooth plane flight using requestAnimationFrame
+  function flyTo(i){
+    i = Math.max(0, Math.min(STAGES.length-1, i));
+    const from = parseFloat(plane.dataset.pct || pctFor(idx));
+    const to = pctFor(i);
 
+    if(anim) cancelAnimationFrame(anim);
+
+    const start = performance.now();
+    const dur = 650; // ms
+    const ease = (t) => 1 - Math.pow(1 - t, 3); // easeOutCubic
+
+    // update current index instantly for correct text highlight
+    idx = i;
+    setActiveStop(idx);
+    const s = STAGES[idx];
+    nowTitle.textContent = `Current: Stop ${idx+1} — ${s.title}`;
+    nowSub.textContent = `${s.date}`;
+
+    // trail width (from 6% to current)
+    trail.style.width = (to - 6) + "%";
+
+    function step(now){
+      const t = Math.min(1, (now - start) / dur);
+      const e = ease(t);
+      const cur = from + (to - from) * e;
+
+      plane.style.left = cur + "%";
+      plane.dataset.pct = cur;
+
+      if(t < 1){
+        anim = requestAnimationFrame(step);
+      }else{
+        plane.dataset.pct = to;
+        plane.style.left = to + "%";
+      }
+    }
+    anim = requestAnimationFrame(step);
+  }
+
+  function openStage(i){
+    flyTo(i);
+
+    const s = STAGES[idx];
     opened.add(s.id);
     save();
 
-    // stop badge opened
+    // mark opened stop
     const btn = stopsEl.children[idx];
     if(btn) btn.classList.add("opened");
 
-    // big viewer
+    // medium viewer
     cImg.src = s.img || "";
     cDate.textContent = s.date;
     cSmall.textContent = `Stage ${idx+1} / ${STAGES.length}`;
@@ -530,16 +570,16 @@ html = """
   });
 
   document.getElementById("next").addEventListener("click", ()=>{
-    planeTo(idx+1);
+    flyTo(idx+1);
   });
   document.getElementById("prev").addEventListener("click", ()=>{
-    planeTo(idx-1);
+    flyTo(idx-1);
   });
   document.getElementById("reset").addEventListener("click", ()=>{
     localStorage.removeItem(KEY);
     opened = new Set();
     buildStops();
-    planeTo(0);
+    flyTo(0);
     closeStage();
   });
 
@@ -556,16 +596,23 @@ html = """
       stopsEl.appendChild(b);
     });
     updateCounter();
+    setActiveStop(0);
   }
 
   buildStops();
-  planeTo(0);
+  updateCounter();
+
+  // init position
+  plane.dataset.pct = pctFor(0);
+  plane.style.left = pctFor(0) + "%";
+  trail.style.width = "0%";
+  flyTo(0);
 </script>
 </body>
 </html>
 """
 
 html = html.replace("__PAYLOAD__", payload_json)
-
 st.components.v1.html(html, height=820, scrolling=False)
-st.caption("✅ Click a stop to open big photo. Click outside to close. Plane moves with Next/Prev.")
+
+st.caption("✅ Plane flies smoothly stop → stop. ✅ Medium photo viewer. ✅ Active stage highlighted correctly.")
